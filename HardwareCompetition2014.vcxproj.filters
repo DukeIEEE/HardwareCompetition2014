@@ -24,12 +24,24 @@
     <ClCompile Include="camera\logantemp\SimpleProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera\LoganTemp\Utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\LoganTemp\WhiteRectangleDetection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera\logantemp\FrameProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="camera\logantemp\SimpleProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\LoganTemp\Utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\LoganTemp\WhiteRectangleDetection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

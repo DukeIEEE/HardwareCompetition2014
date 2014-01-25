@@ -30,9 +30,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="opencv_debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="opencv_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -53,6 +55,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>opencv_core247d.lib;opencv_imgproc247d.lib;opencv_highgui247d.lib;opencv_ml247d.lib;opencv_video247d.lib;opencv_features2d247d.lib;opencv_calib3d247d.lib;opencv_objdetect247d.lib;opencv_contrib247d.lib;opencv_legacy247d.lib;opencv_flann247d.lib;%(AdditionalDependencies);opencv_nonfree247d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -74,10 +77,14 @@
     <ClCompile Include="camera\logantemp\FrameProcessor.cpp" />
     <ClCompile Include="camera\logantemp\Main.cpp" />
     <ClCompile Include="camera\logantemp\SimpleProcessor.cpp" />
+    <ClCompile Include="Camera\LoganTemp\Utilities.cpp" />
+    <ClCompile Include="Camera\LoganTemp\WhiteRectangleDetection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera\logantemp\FrameProcessor.h" />
     <ClInclude Include="camera\logantemp\SimpleProcessor.h" />
+    <ClInclude Include="Camera\LoganTemp\Utilities.h" />
+    <ClInclude Include="Camera\LoganTemp\WhiteRectangleDetection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
