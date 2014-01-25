@@ -17,7 +17,7 @@ int main() {
 	Mat frame;
 
    //grab camera capture
-   capture = cvCaptureFromCAM( -1 );
+   capture = cvCaptureFromCAM(0);
    if( capture ) {
      while (true) {
 		frame = cvQueryFrame( capture );
@@ -27,12 +27,10 @@ int main() {
 		   std::cerr << " --(!) No captured frame -- Break!" << std::endl; 
 		   break; 
 	   }
-
 	   processor->Display();
        int c = waitKey(10);
-       if( (char)c == 'q' ) break;
+	   if ((char)c == 'q') break;
       }
    }
    return 0;
 }
-
