@@ -20,3 +20,5 @@ public:
 		this->img = img;
 	}
 };
+
+#include "Utilities.h"

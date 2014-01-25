@@ -4,25 +4,12 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
-//#define CALIBRATE_RED_MASK
-#include "SimpleProcessor.h"
+#include "WhiteRectangleDetection.h"
 
 using namespace cv;
 
-SimpleProcessor::SimpleProcessor() : FrameProcessor("Output") {
-#ifdef CALIBRATE
-	createTrackbar("hbegin", get_window_name(), &hbegin, 179);
-	createTrackbar("hend", get_window_name(), &hend, 179);
-	createTrackbar("slow", get_window_name(), &slow, 255);
-	createTrackbar("shigh", get_window_name(), &shigh, 255);
-	createTrackbar("vlow", get_window_name(), &vlow, 255);
-	createTrackbar("vhigh", get_window_name(), &vhigh, 255);
-#endif
-}
-
-void SimpleProcessor::Process(cv::Mat frame) {
+void WhiteRectangleDetection::Process(cv::Mat frame) {
 	flip(frame, frame, 1); //flip frame across y-axis
-
 
 	Mat equalized = equalizeIntensity(frame);
 
@@ -55,10 +42,7 @@ void SimpleProcessor::Process(cv::Mat frame) {
 
 	blur(white_mask, white_mask, Size(5,5));
 	threshold(white_mask, white_mask, 128, 255, CV_THRESH_BINARY);
-	//imshow("White Mask", white_mask);
-	dilate(red_mask, red_mask, Mat());
-	imshow("Red Mask", red_mask);
-	//imshow("Mask", mask);
+	imshow("White Mask", white_mask);
 	
 	Mat grayscale;
 	cvtColor(equalized, grayscale, CV_BGR2GRAY);
@@ -69,38 +53,13 @@ void SimpleProcessor::Process(cv::Mat frame) {
 	threshold(grayscale, out, 200, 255, CV_THRESH_BINARY);
 	erode(out, out, Mat());
 	dilate(out, out, Mat());
-	namedWindow("Threshold");
-	imshow("Threshold", out);
+	//namedWindow("Threshold");
+	//imshow("Threshold", out);
 
 	Mat combined = out & white_mask;
 	//namedWindow("Combined");
-	//imshow("Combined", combined);
+	//imshow("Combined", combined
 
-	
-	//split image for sobel processing
-	vector<Mat> planes;
-	split(equalized, planes);
-		Mat sobelR, sobelG, sobelB, sobelSat, sobelMask;
-	//calculate sobel for red, green, and blue planes
-	generateSobelMask(planes[0], sobelB, 230);
-	generateSobelMask(planes[1], sobelG, 230);
-	generateSobelMask(planes[2], sobelR, 230);
-
-	planes.clear();
-	split(hsv, planes);
-	//calculate for saturation plane as well
-	generateSobelMask(planes[1], sobelSat, 230);
-
-	//combine the masks
-	sobelMask = .6 * sobelR + .6 * sobelG + .6 * sobelB + .6 * sobelSat;
-	//imshow("SobelR", sobelR);
-	//imshow("SobelG", sobelG);
-	//imshow("SobelB", sobelB);
-	//imshow("SobelSat", sobelSat);
-
-	//threshold(sobelMask, sobelMask, 180, 255, CV_THRESH_BINARY);
-	//imshow("SobelMask", sobelMask);
-	
 
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
@@ -109,14 +68,17 @@ void SimpleProcessor::Process(cv::Mat frame) {
 
 	RNG rng(12345);
 	/// Find contours
-  findContours( red_mask, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+  findContours(white_mask, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
   /// Draw contours
-  //Mat drawing = Mat::zeros( sobelMask.size(), CV_8UC3 );
   for( int i = 0; i< contours.size(); i++ )
      {
 	   double contour_area = contourArea(contours[i]);
-	   if(contour_area < 1000) continue;
+	   if(contour_area < 600 || contour_area > 1200) continue;
+	   Rect bounding_rect = boundingRect(contours[i]);
+	   double rect_area = bounding_rect.area();
+	   double diff = abs((contour_area-rect_area)/rect_area);
+	   if(diff > .4) continue;
 	   Moments m = moments(contours[i]);
 	   Point center(m.m10/m.m00,m.m01/m.m00);
 	   contour_center.push_back(center);
@@ -135,21 +97,5 @@ void SimpleProcessor::Process(cv::Mat frame) {
 	  circle(equalized, center, 3, Scalar(255,0,0), -1, 8, 0);
   }
 
-	/*vector<Vec4i> lines;
-	Mat sobel, sobelX, sobelY;
-Sobel(out,sobelX,CV_8U,1,0);
-Sobel(out,sobelY,CV_8U,0,1);
-sobel = sobelX + sobelY;
-HoughLinesP(sobel, lines, 1, CV_PI/180, 50, 50, 10 );
-  for( size_t i = 0; i < lines.size(); i++ )
-  {
-    Vec4i l = lines[i];
-    line( equalized, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
-  }
-  namedWindow("sobel");
-  imshow("sobel", sobel);*/
-
-
-	//findContours(out, contours, 
 	set_img(equalized);
 }
