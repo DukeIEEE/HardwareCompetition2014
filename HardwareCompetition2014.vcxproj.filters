@@ -30,6 +30,9 @@
     <ClCompile Include="Camera\LoganTemp\WhiteRectangleDetection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera\LoganTemp\SurfProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera\logantemp\FrameProcessor.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera\LoganTemp\WhiteRectangleDetection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\LoganTemp\SurfProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

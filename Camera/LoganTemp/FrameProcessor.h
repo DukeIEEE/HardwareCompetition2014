@@ -10,7 +10,9 @@ public:
 	}
 	//FrameProcessor() : FrameProcessor("Unnamed window") {}
 	virtual void Process(cv::Mat)=0;
-
+	
+	virtual void PreProcess(CvCapture*){
+	};
 	void Display();
 
 	std::string get_window_name() {
