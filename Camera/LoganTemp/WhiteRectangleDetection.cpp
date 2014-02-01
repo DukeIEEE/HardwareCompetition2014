@@ -70,7 +70,7 @@ void WhiteRectangleDetection::Process(cv::Mat frame) {
 	/// Find contours
   findContours(white_mask, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
-  /// Draw contours
+   //Draw contours
   for( int i = 0; i< contours.size(); i++ )
      {
 	   double contour_area = contourArea(contours[i]);

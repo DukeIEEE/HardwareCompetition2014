@@ -7,3 +7,28 @@ Please use Google C++ Style Guide found at http://google-styleguide.googlecode.c
 Commits
 ====================
 Commit your changes! Precious time is wasted tracking down people if you only save your code on your computer.
+
+
+c/c++ -> general -> additional include 
+
+$(OPENCV_DIR)\..\..\include
+
+linker -> general -> additional
+
+$(OPENCV_DIR)\lib
+
+
+linker -> input -> additional dependencies
+opencv_core247d.lib
+opencv_imgproc247d.lib
+opencv_highgui247d.lib
+opencv_ml247d.lib
+opencv_video247d.lib
+opencv_features2d247d.lib
+opencv_calib3d247d.lib
+opencv_objdetect247d.lib
+opencv_contrib247d.lib
+opencv_legacy247d.lib
+opencv_flann247d.lib
+%(AdditionalDependencies)
+opencv_nonfree247d.lib

@@ -16,6 +16,18 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+=======
+
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
+
+# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
+!packages/*/build/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
@@ -27,6 +39,10 @@ TestResult.xml
 *_i.c
 *_p.c
 *_i.h
+
+*_i.c
+*_p.c
+
 *.ilk
 *.meta
 *.obj
@@ -46,11 +62,15 @@ TestResult.xml
 *.vssscc
 .builds
 *.pidb
+
 *.svclog
 *.scc
 
 # Chutzpah Test files
 _Chutzpah*
+
+*.log
+*.scc
 
 # Visual C++ cache files
 ipch/
@@ -65,6 +85,7 @@ ipch/
 *.vsp
 *.vspx
 
+
 # TFS 2012 Local Workspace
 $tf/
 
@@ -74,10 +95,12 @@ $tf/
 # ReSharper is a .NET coding add-in
 _ReSharper*/
 *.[Rr]e[Ss]harper
+
 *.DotSettings.user
 
 # JustCode is a .NET coding addin-in
 .JustCode
+
 
 # TeamCity is a build add-in
 _TeamCity*
@@ -87,12 +110,15 @@ _TeamCity*
 
 # NCrunch
 *.ncrunch*
+
 _NCrunch_*
 .*crunch*.local.xml
 
 # MightyMoose
 *.mm.*
 AutoTest.Net/
+
+.*crunch*.local.xml
 
 # Installshield output folder
 [Ee]xpress/
@@ -111,6 +137,7 @@ DocProject/Help/html
 publish/
 
 # Publish Web Output
+
 *.[Pp]ublish.xml
 *.azurePubxml
 
@@ -126,6 +153,16 @@ publish/
 
 # Windows Azure Build Output
 csx/
+
+*.Publish.xml
+
+# NuGet Packages Directory
+## TODO: If you have NuGet Package Restore enabled, uncomment the next line
+#packages/
+
+# Windows Azure Build Output
+csx
+
 *.build.csdef
 
 # Windows Store app package directory
@@ -139,10 +176,16 @@ ClientBin/
 ~$*
 *~
 *.dbmdl
+
 *.dbproj.schemaview
 *.pfx
 *.publishsettings
 node_modules/
+
+*.[Pp]ublish.xml
+*.pfx
+*.publishsettings
+
 
 # RIA/Silverlight projects
 Generated_Code/
@@ -158,6 +201,7 @@ UpgradeLog*.htm
 App_Data/*.mdf
 App_Data/*.ldf
 
+<<<<<<< HEAD
 # Business Intelligence projects
 *.rdl.data
 *.bim.layout
@@ -165,6 +209,12 @@ App_Data/*.ldf
 
 # Microsoft Fakes
 FakesAssemblies/
+
+
+#LightSwitch generated files
+GeneratedArtifacts/
+_Pvt_Extensions/
+ModelManifest.xml
 
 # =========================
 # Windows detritus
@@ -179,6 +229,7 @@ Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
+
 
 ##### C++
 # Compiled Object files
@@ -202,3 +253,6 @@ $RECYCLE.BIN/
 *.exe
 *.out
 *.app
+
+# Mac desktop service store files
+.DS_Store
