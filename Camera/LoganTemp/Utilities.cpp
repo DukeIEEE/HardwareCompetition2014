@@ -58,3 +58,15 @@ void generateSobelMask(Mat in, Mat & out, int thresh) {
 	//threshold out edges
 	threshold(out, out, thresh, 255, CV_THRESH_BINARY_INV);
 }
+
+//adaptive median filtering
+
+Scalar getMedianHSV(Mat &inputImage, int previousMedianH, int tolerance) {
+	Scalar medianHSV;
+	Mat_<Vec3b>::iterator it = inputImage.begin<Vec3b>(), itEnd = inputImage.end<Vec3b>();
+	for (; it != itEnd; ++it) {
+		(*it)[1] ^= 255;
+
+	}
+	return medianHSV;
+}

@@ -8,9 +8,6 @@
 
 //The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-#include <sstream>
-#include <string>
-#include <iostream>
 #include <windows.h>
 #include <opencv\highgui.h>
 #include <opencv\cv.h>
@@ -41,6 +38,7 @@ const string windowName3 = "After Morphological Operations";
 const string trackbarWindowName = "Trackbars";
 
 bool isFirstRun = true;
+bool showHSVTrackbars = true;
 
 int halfScreenWidth = GetSystemMetrics(SM_CXSCREEN) / 2;
 int halfScreenHeight = GetSystemMetrics(SM_CYSCREEN) / 2;
@@ -50,8 +48,8 @@ Mat HSVImage;
 Mat filteredImage;
 Mat thresholdedImage;
 
+bool useMorphOps = true;
 bool useTrackFilteredObject = false;
-bool useMorphOps = false;
 
 //functions--------------------------------------------------------------------------------------------------------------------------------
 
@@ -82,7 +80,9 @@ void createHSVTrackbars() {
 int main() {
 	int x = 0, y = 0; //x and y values for the location of the object
 
-	createHSVTrackbars(); //create slider bars for HSVImage filtering
+	if (showHSVTrackbars) {
+		createHSVTrackbars(); //create slider bars for HSVImage filtering
+	}
 
 	VideoCapture capture; //video capture object to acquire webcam feed
 	capture.open(0); //open capture object at location zero (default location for webcam)
@@ -94,10 +94,7 @@ int main() {
 		
 		cvtColor(cameraImage, HSVImage, COLOR_BGR2HSV); //convert frame from BGR to HSVImage colorspace
 
-	//dynamically determine HSV ranges closest to red to track
-	//filteredImage = findRed(HSVImage);
-	//GaussianBlur(filteredImage, filteredImage, Size(6, 6), 2.0);
-	//Sobel(HSVImage, filteredImage, 1.0, 1, 1);
+		//filteredImage = findRed(HSVImage);
 
 		//filter HSVImage image between values and store filtered image to thresholdedImage matrix
 		inRange(HSVImage, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), thresholdedImage);

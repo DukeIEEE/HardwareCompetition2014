@@ -1,3 +1,9 @@
+#define _CRT_SECURE_NO_DEPRECATE
+
+#include <sstream>
+#include <string>
+#include <iostream>
+
 #include <opencv\highgui.h>
 #include <opencv\cv.h>
 
@@ -16,7 +22,38 @@ const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH / 1.5;
 
 //functions--------------------------------------------------------------------------------------------------------------------------------
 
-void trackFilteredObject(int &x, int &y, Mat thresholdedImage, Mat &cameraRBGImage) {
+string intToString(int number) {
+	std::stringstream ss;
+	ss << number;
+	return ss.str();
+}
+
+void drawObject(int x, int y, Mat &frame) {
+	//use some of the openCV drawing functions to draw crosshairs
+	//on your tracked image!
+
+	//UPDATE:JUNE 18TH, 2013
+	//added 'if' and 'else' statements to prevent
+	//memory errors from writing off the screen (ie. (-25,-25) is not within the window!)
+
+	circle(frame, Point(x, y), 20, Scalar(0, 255, 0), 2);
+	if (y - 25>0)
+		line(frame, Point(x, y), Point(x, y - 25), Scalar(0, 255, 0), 2);
+	else line(frame, Point(x, y), Point(x, 0), Scalar(0, 255, 0), 2);
+	if (y + 25<FRAME_HEIGHT)
+		line(frame, Point(x, y), Point(x, y + 25), Scalar(0, 255, 0), 2);
+	else line(frame, Point(x, y), Point(x, FRAME_HEIGHT), Scalar(0, 255, 0), 2);
+	if (x - 25>0)
+		line(frame, Point(x, y), Point(x - 25, y), Scalar(0, 255, 0), 2);
+	else line(frame, Point(x, y), Point(0, y), Scalar(0, 255, 0), 2);
+	if (x + 25<FRAME_WIDTH)
+		line(frame, Point(x, y), Point(x + 25, y), Scalar(0, 255, 0), 2);
+	else line(frame, Point(x, y), Point(FRAME_WIDTH, y), Scalar(0, 255, 0), 2);
+
+	putText(frame, intToString(x) + "," + intToString(y), Point(x, y + 30), 1, 1, Scalar(0, 255, 0), 2);
+}
+
+void trackFilteredObject(int &x, int &y, Mat thresholdedImage, Mat &cameraImage) {
 	Mat temp;
 	thresholdedImage.copyTo(temp);
 	//these two vectors needed for output of findContours
@@ -51,44 +88,13 @@ void trackFilteredObject(int &x, int &y, Mat thresholdedImage, Mat &cameraRBGIma
 			}
 			//let user know you found an object
 			if (objectFound) {
-				putText(cameraRBGImage, "Tracking Object", Point(0, 50), 2, 1, Scalar(0, 255, 0), 2);
+				putText(cameraImage, "Tracking Object", Point(0, 50), 2, 1, Scalar(0, 255, 0), 2);
 				//draw object location on screen
-				drawObject(x, y, cameraRBGImage);
+				drawObject(x, y, cameraImage);
 			}
 		}
 		else {
-			putText(cameraRBGImage, "TOO MUCH NOISE! ADJUST FILTER", Point(0, 50), 1, 2, Scalar(0, 0, 255), 2);
+			putText(cameraImage, "TOO MUCH NOISE! ADJUST FILTER", Point(0, 50), 1, 2, Scalar(0, 0, 255), 2);
 		}
 	}
-}
-
-void drawObject(int x, int y, Mat &frame) {
-	//use some of the openCV drawing functions to draw crosshairs
-	//on your tracked image!
-
-	//UPDATE:JUNE 18TH, 2013
-	//added 'if' and 'else' statements to prevent
-	//memory errors from writing off the screen (ie. (-25,-25) is not within the window!)
-
-	circle(frame, Point(x, y), 20, Scalar(0, 255, 0), 2);
-	if (y - 25>0)
-		line(frame, Point(x, y), Point(x, y - 25), Scalar(0, 255, 0), 2);
-	else line(frame, Point(x, y), Point(x, 0), Scalar(0, 255, 0), 2);
-	if (y + 25<FRAME_HEIGHT)
-		line(frame, Point(x, y), Point(x, y + 25), Scalar(0, 255, 0), 2);
-	else line(frame, Point(x, y), Point(x, FRAME_HEIGHT), Scalar(0, 255, 0), 2);
-	if (x - 25>0)
-		line(frame, Point(x, y), Point(x - 25, y), Scalar(0, 255, 0), 2);
-	else line(frame, Point(x, y), Point(0, y), Scalar(0, 255, 0), 2);
-	if (x + 25<FRAME_WIDTH)
-		line(frame, Point(x, y), Point(x + 25, y), Scalar(0, 255, 0), 2);
-	else line(frame, Point(x, y), Point(FRAME_WIDTH, y), Scalar(0, 255, 0), 2);
-
-	putText(frame, intToString(x) + "," + intToString(y), Point(x, y + 30), 1, 1, Scalar(0, 255, 0), 2);
-}
-
-string intToString(int number) {
-	std::stringstream ss;
-	ss << number;
-	return ss.str();
 }

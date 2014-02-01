@@ -1,13 +1,14 @@
+#define _CRT_SECURE_NO_DEPRECATE
+
 #include <opencv\highgui.h>
 #include <opencv\cv.h>
+#include "Filters.h"
 
 using namespace cv;
 
 //variables--------------------------------------------------------------------------------------------------------------------------------
 
 bool useGaussianBlur = false;
-bool useErode = false;
-bool useDilate = false;
 bool useSobel = false;
 bool useEqualize = false;
 bool useNormalize = false;
@@ -27,4 +28,23 @@ void morphOps(Mat &thresh) {
 
 	dilate(thresh, thresh, dilateElement);
 	dilate(thresh, thresh, dilateElement);
+}
+
+void updateRedHSV(Mat &img) {
+	//dynamically determine HSV ranges closest to red to track
+}
+
+Mat filterImage(Mat &img) {
+	if (useGaussianBlur) {
+		GaussianBlur(img, img, Size(6, 6), 2.0);
+	}
+	if (useSobel) {
+		Sobel(img, img, 1.0, 1, 1);
+	}
+	if (useEqualize) {
+		equalizeHist(img, img);
+	}
+	if (useNormalize) {
+		normalize(img, img, 1.0, 1);
+	}
 }
