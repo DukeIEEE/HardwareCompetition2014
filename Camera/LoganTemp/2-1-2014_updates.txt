@@ -1,0 +1,4 @@
+I added a new Processor called RedWhiteProcessor that applies an average value filter to HSV for red and white.
+It performs the same tasks as SimpleProcessor except it seems more stable than choosing a fixed set of HSV values.
+The averaging filter takes the previous HSV, previous median, and tolerance as inputs.
+Note that Vec3b and Scalar are different, but I also added funtions to convert them, assuming that Scalar has 3 values.

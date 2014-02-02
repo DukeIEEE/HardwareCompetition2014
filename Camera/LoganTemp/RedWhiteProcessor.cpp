@@ -25,6 +25,67 @@ RedWhiteProcessor::RedWhiteProcessor(): FrameProcessor("Output") {
 #endif
 }
 
+//functions----------------------------------------------------------------
+
+Vec3b toVec3b(Scalar s) {
+	Vec3b vec;
+	for (int i = 0; i < 3; i++) {
+		vec.val[i] = s.val[i];
+	}
+	return vec;
+}
+
+Scalar toScalar(Vec3b vec) {
+	Scalar s;
+	for (int i = 0; i < 3; i++) {
+		s.val[i] = vec.val[i];
+	}
+	return s;
+}
+
+bool areEqual(Vec3b v1, Vec3b v2) {
+	for (int i = 0; i < 3; i++) {
+		if (v1.val[i] != v2.val[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool isWithin(Vec3b vec, Vec3b previousVec, Vec3b tolerance) {
+	Vec3b lower = previousVec - tolerance;
+	Vec3b upper = previousVec + tolerance;
+	return areEqual((vec - upper), { 0, 0, 0 }) && areEqual((lower - vec), { 0, 0, 0 }); //works because vec.val[i] cannot be lower than 0
+}
+
+Vec3b getAverageHSV(Mat img, Vec3b previousAverage, Vec3b tolerance) {
+	int rows = img.rows;
+	int cols = img.cols;
+
+	//vector<Mat> channels;
+	//split(previousImg, channels);
+	//Mat HImg = channels[0];
+	//Mat SImg = channels[1];
+	//Mat VImg = channels[2];
+
+	Vec3b sumHSV = { 0, 0, 0 };
+	int numPixels = 0;
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			Vec3b pixelVals = img.at<Vec3b>(i, j);
+			if (isWithin(pixelVals, previousAverage, tolerance)) {
+				sumHSV += img.at<Vec3b>(i, j);
+				numPixels++;
+			}
+		}
+	}
+
+	if (numPixels < rows * cols / 10) {
+		return previousAverage;
+	}
+	return sumHSV / numPixels;
+}
+
 void RedWhiteProcessor::Process(cv::Mat frame) {
 	flip(frame, frame, 1); //flip frame across y-axis
 	
@@ -63,32 +124,37 @@ void RedWhiteProcessor::Process(cv::Mat frame) {
 
 	bool isFirstRun = true;
 
-	int medianRedH, toleranceRedH;
-	int medianRedS, toleranceRedS;
-	int medianRedV, toleranceRedV;
+	Scalar redLow;
+	Scalar redHigh;
+	Scalar whiteLow;
+	Scalar whiteHigh;
 
-	int medianWhiteH, toleranceWhiteH;
-	int medianWhiteS, toleranceWhiteS;
-	int medianWhiteV, toleranceWhiteV;
-
-	if (!isFirstRun) {
-		//adaptive median red filter
-		////Scalar medianRedH = getMedianH(frame);
-		//adaptive median white filter
-
-	}
-
-	Scalar redLow = Scalar(medianRedH - toleranceRedH, medianRedS - toleranceRedS, medianRedV - toleranceRedV);
-	Scalar redHigh = Scalar(medianRedH + toleranceRedH, medianRedS + toleranceRedS, medianRedV + toleranceRedV);
-
-	Scalar whiteLow = Scalar(medianWhiteH - toleranceWhiteH, medianWhiteS - toleranceWhiteS, medianWhiteV - toleranceWhiteV);
-	Scalar whiteHigh = Scalar(medianWhiteH + toleranceWhiteH, medianWhiteS + toleranceWhiteS, medianWhiteV + toleranceWhiteV);
+	Vec3b averageRedHSV;
+	Vec3b redTolerance;
+	Vec3b averageWhiteHSV;
+	Vec3b whiteTolerance;
 
 	if (isFirstRun) {
 		redLow = Scalar(0, 146, 21);
 		redHigh = Scalar(17, 253, 255);
 		whiteLow = Scalar(83, 5, 186);
 		whiteHigh = Scalar(148, 127, 255);
+
+		averageRedHSV = (toVec3b(redHigh) + toVec3b(redLow)) / 2;
+		redTolerance = (toVec3b(redHigh) - toVec3b(redLow)) / 2;
+		averageWhiteHSV = (toVec3b(whiteHigh) + toVec3b(whiteLow)) / 2;
+		whiteTolerance = (toVec3b(whiteHigh) - toVec3b(whiteLow)) / 2;
+	}
+	else {
+		//adaptive mean filter
+
+		redLow = toScalar(averageRedHSV - redTolerance);
+		redHigh = toScalar(averageRedHSV + redTolerance);
+		whiteLow = toScalar(averageWhiteHSV - whiteTolerance);
+		whiteHigh = toScalar(averageWhiteHSV + whiteTolerance);
+
+		averageRedHSV = getAverageHSV(frame, averageRedHSV, redTolerance);
+		averageWhiteHSV = getAverageHSV(frame, averageWhiteHSV, whiteTolerance);
 	}
 
 	inRange(hsv, redLow, redHigh, red_mask);
@@ -118,7 +184,7 @@ void RedWhiteProcessor::Process(cv::Mat frame) {
 	//namedWindow("Combined");
 	//imshow("Combined", combined);
 
-	//----------------------------------------------------------------Sobel
+	//--------------------------------------------------------------------------------------------------------------------------------Sobel
 
 	//split image for sobel processing
 	vector<Mat> planes;
@@ -144,7 +210,7 @@ void RedWhiteProcessor::Process(cv::Mat frame) {
 	//threshold(sobelMask, sobelMask, 180, 255, CV_THRESH_BINARY);
 	//imshow("SobelMask", sobelMask);
 
-	//----------------------------------------------------------------Find center
+	//--------------------------------------------------------------------------------------------------------------------------------Find center
 
 	vector<vector<Point>> contours;
 	vector<Vec4i> hierarchy;
@@ -155,7 +221,7 @@ void RedWhiteProcessor::Process(cv::Mat frame) {
 	/// Find contours
 	findContours(red_mask, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-	/// Draw contours
+	//--------------------------------------------------------------------------------------------------------------------------------Draw contours
 	//Mat drawing = Mat::zeros( sobelMask.size(), CV_8UC3 );
 	for (int i = 0; i< contours.size(); i++)
 	{
