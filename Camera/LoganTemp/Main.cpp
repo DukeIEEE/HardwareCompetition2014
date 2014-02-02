@@ -13,7 +13,7 @@
 
 using namespace cv;
 
-int main() {
+int main0() {
 	std::unique_ptr<FrameProcessor> processor(new SimpleProcessor());//new WhiteRectangleDetection());
 	CvCapture* capture;
 	Mat frame;
@@ -39,7 +39,7 @@ int main() {
 	return 0;
 }
 
-void main0() {
+void main() {
 	std::unique_ptr<FrameProcessor> processor(new RedWhiteProcessor());//new WhiteRectangleDetection());
 	CvCapture* capture;
 	Mat frame;
@@ -58,7 +58,7 @@ void main0() {
 			}
 
 			processor->Display();
-			int c = waitKey(100);
+			int c = waitKey(10);
 			if ((char)c == 'q') break;
 		}
 	}
