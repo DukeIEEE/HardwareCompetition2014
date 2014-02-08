@@ -94,11 +94,10 @@ void RedWhiteProcessor::Process(cv::Mat frame) {
 	Mat equalized = equalizeIntensity(frame);
 	Mat hsv; //hold hsv components
 	cvtColor(equalized, hsv, CV_BGR2HSV); //find red and white objects
-	Mat red_mask, white_mask;
 
 	if (isFirstRun) {
-		redLow = Scalar(0, 146, 21);
-		redHigh = Scalar(17, 253, 255);
+		redLow = Scalar(0, 204, 0);
+		redHigh = Scalar(32, 240, 255);
 		whiteLow = Scalar(83, 5, 186);
 		whiteHigh = Scalar(148, 127, 255);
 
@@ -121,16 +120,34 @@ void RedWhiteProcessor::Process(cv::Mat frame) {
 		whiteHigh = toScalar(averageWhiteHSV + whiteTolerance);
 	}
 
-	inRange(hsv, redLow, redHigh, red_mask);
+	Mat red_mask, white_mask, mask, mask2, temp_mask, mask_A, mask_B, mask_C, mask_sam;
+
+	inRange(hsv, redLow, redHigh, temp_mask);
+
+	inRange(hsv, Scalar(0, 0, 0), Scalar(4, 255, 255), mask);
+	inRange(hsv, Scalar(173, 0, 0), Scalar(255, 255, 255), mask2);
+	red_mask = (mask | mask2) & temp_mask;
 	inRange(hsv, whiteLow, whiteHigh, white_mask);
+	inRange(hsv, Scalar(8, 0, 0), Scalar(127, 255, 255), mask_A);
+	inRange(hsv, Scalar(0, 0, 0), Scalar(255, 131, 255), mask_B);
+	//inRange(hsv, Scalar(18, 0, 0), Scalar(133, 179, 179), mask_C);
+	mask_A = ~mask_A;
+	mask_B = ~mask_B;
+	//mask_C = ~mask_C;
+	mask_sam = mask_A & mask_B;// &mask_C;
 
 	//Everything beyond here is copied code----------------------------------------------------------------
 
 	blur(white_mask, white_mask, Size(5, 5));
 	threshold(white_mask, white_mask, 128, 255, CV_THRESH_BINARY);
 	//imshow("White Mask", white_mask);
-	dilate(red_mask, red_mask, Mat());
-	imshow("Red Mask", red_mask);
+
+	//dilate(red_mask, red_mask, Mat());
+	//imshow("Red Mask", red_mask);
+
+	dilate(mask, mask, Mat());
+	//imshow("Not red Mask", mask);
+	imshow("Sam Mask", mask_sam);
 
 	Mat grayscale;
 	cvtColor(equalized, grayscale, CV_BGR2GRAY);
@@ -163,7 +180,7 @@ void RedWhiteProcessor::Process(cv::Mat frame) {
 	split(hsv, planes);
 	//calculate for saturation plane as well
 	generateSobelMask(planes[1], sobelSat, 230);
-
+	
 	//combine the masks
 	sobelMask = .6 * sobelR + .6 * sobelG + .6 * sobelB + .6 * sobelSat;
 	//imshow("SobelR", sobelR);
@@ -183,7 +200,7 @@ void RedWhiteProcessor::Process(cv::Mat frame) {
 
 	RNG rng(12345);
 	/// Find contours
-	findContours(red_mask, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+	findContours(mask_sam, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
 	//--------------------------------------------------------------------------------------------------------------------------------old
 
