@@ -13,7 +13,7 @@
 using namespace cv;
 
 int main() {
-	std::unique_ptr<FrameProcessor> processor(new SurfProcessor());//new WhiteRectangleDetection());
+	std::unique_ptr<FrameProcessor> processor(new RedWhiteProcessor());//new WhiteRectangleDetection());
 	CvCapture* capture;
 	Mat frame;
 

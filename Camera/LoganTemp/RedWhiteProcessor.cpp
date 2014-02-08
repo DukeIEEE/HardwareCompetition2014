@@ -58,7 +58,7 @@ bool isWithin(Vec3b vec, Vec3b previousVec, Vec3b tolerance) {
 	Vec3b lower = previousVec - tolerance;
 	Vec3b upper = previousVec + tolerance;
 	//works because vec.val[i] cannot be lower than 0
-	return areEqual((vec - upper), { 0, 0, 0 }) && areEqual((lower - vec), { 0, 0, 0 });
+	return ((vec - upper)==Vec3b(0,0,0)) && ((lower-vec) == Vec3b(0, 0, 0));
 }
 
 Vec3b getAverageHSV(Mat img, Vec3b previousAverage, Vec3b tolerance) {
@@ -71,7 +71,7 @@ Vec3b getAverageHSV(Mat img, Vec3b previousAverage, Vec3b tolerance) {
 	//Mat SImg = channels[1];
 	//Mat VImg = channels[2];
 
-	Vec3b sumHSV = { 0, 0, 0 };
+	Vec3b sumHSV = Vec3b(0, 0, 0);
 	int numPixels = 0;
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
