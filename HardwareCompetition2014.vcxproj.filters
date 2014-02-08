@@ -36,6 +36,9 @@
     <ClCompile Include="Camera\LoganTemp\RedWhiteProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera\LoganTemp\CombinedProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera\logantemp\FrameProcessor.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera\LoganTemp\RedWhiteProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\LoganTemp\CombinedProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

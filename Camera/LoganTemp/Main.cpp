@@ -10,10 +10,11 @@
 #include "WhiteRectangleDetection.h"
 #include "SurfProcessor.h"
 #include "RedWhiteProcessor.h"
+#include "CombinedProcessor.h"
 using namespace cv;
 
 int main() {
-	std::unique_ptr<FrameProcessor> processor(new RedWhiteProcessor());//new WhiteRectangleDetection());
+	std::unique_ptr<FrameProcessor> processor(new CombinedProcessor());//new WhiteRectangleDetection());
 	CvCapture* capture;
 	Mat frame;
 

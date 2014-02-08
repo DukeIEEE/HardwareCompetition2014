@@ -4,11 +4,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
-#include "SimpleProcessor.h"
+#include "CombinedProcessor.h"
 
 using namespace cv;
-
-SimpleProcessor::SimpleProcessor() : FrameProcessor("Output") {
+CombinedProcessor::CombinedProcessor() : FrameProcessor("Output") {
 #ifdef CALIBRATE
 	createTrackbar("hbegin", get_window_name(), &hbegin, 179);
 	createTrackbar("hend", get_window_name(), &hend, 179);
@@ -19,9 +18,9 @@ SimpleProcessor::SimpleProcessor() : FrameProcessor("Output") {
 #endif
 }
 
-void SimpleProcessor::Process(cv::Mat frame) {
-	flip(frame, frame, 1); //flip frame across y-axis
 
+void CombinedProcessor::Process(cv::Mat frame) {
+	flip(frame, frame, 1); //flip frame across y-axis
 
 	Mat equalized = equalizeIntensity(frame);
 
@@ -38,7 +37,7 @@ void SimpleProcessor::Process(cv::Mat frame) {
 	inRange(hsv, Scalar(159, 26, 77), Scalar(179,141,204), red_mask2);
 #endif
 
-	red_mask = red_mask1 | red_mask2;
+	red_mask = red_mask1;// | red_mask2;
 
 #ifdef CALIBRATE_WHITE_MASK
 	inRange(hsv, Scalar(hbegin, slow, vlow), Scalar(hend, shigh, vhigh), white_mask);
@@ -57,8 +56,7 @@ void SimpleProcessor::Process(cv::Mat frame) {
 	imshow("White Mask", white_mask);
 	dilate(red_mask, red_mask, Mat());
 	imshow("Red Mask", red_mask);
-	//imshow("Mask", white_mask);
-	
+
 	Mat grayscale;
 	cvtColor(equalized, grayscale, CV_BGR2GRAY);
 	//namedWindow("Grayscale");
@@ -68,47 +66,39 @@ void SimpleProcessor::Process(cv::Mat frame) {
 	threshold(grayscale, out, 200, 255, CV_THRESH_BINARY);
 	erode(out, out, Mat());
 	dilate(out, out, Mat());
-	namedWindow("Threshold");
-	imshow("Threshold", out);
+	//namedWindow("Threshold");
+	//imshow("Threshold", out);
 
 	Mat combined = out & white_mask;
 	//namedWindow("Combined");
-	//imshow("Combined", combined);
+	//imshow("Combined", combined
 
-	
-	//split image for sobel processing
-	vector<Mat> planes;
-	split(equalized, planes);
-		Mat sobelR, sobelG, sobelB, sobelSat, sobelMask;
-	//calculate sobel for red, green, and blue planes
-	generateSobelMask(planes[0], sobelB, 230);
-	generateSobelMask(planes[1], sobelG, 230);
-	generateSobelMask(planes[2], sobelR, 230);
 
-	planes.clear();
-	split(hsv, planes);
-	//calculate for saturation plane as well
-	generateSobelMask(planes[1], sobelSat, 230);
+	vector<vector<Point> > white_contours;
+	vector<Vec4i> white_hierarchy;
 
-	//combine the masks
-	sobelMask = .6 * sobelR + .6 * sobelG + .6 * sobelB ;//+ .6 * sobelSat;
-	//imshow("SobelR", sobelR);
-	//imshow("SobelG", sobelG);
-	//imshow("SobelB", sobelB);
-	//imshow("SobelSat", sobelSat);
-
-	//threshold(sobelMask, sobelMask, 180, 255, CV_THRESH_BINARY);
-	imshow("SobelMask", sobelMask);
-	
-
-	vector<vector<Point> > contours;
-	vector<Vec4i> hierarchy;
-
-	vector<Point> contour_center;
+	vector<Point> white_contour_center;
 
 	RNG rng(12345);
 	/// Find contours
-  findContours( red_mask, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+  findContours(white_mask, white_contours, white_hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+   //Draw contours
+  //for( int i = 0; i< white_contours.size(); i++ )
+  //   {
+	 //  double contour_area = contourArea(white_contours[i]);
+	 //  if(contour_area < 600 || contour_area > 1200) continue;
+	 //  Rect bounding_rect = boundingRect(white_contours[i]);
+	 //  double rect_area = bounding_rect.area();
+	 //  double diff = abs((contour_area-rect_area)/rect_area);
+	 //  if(diff > .4) continue;
+	 //  Moments m = moments(white_contours[i]);
+	 //  Point center(m.m10/m.m00,m.m01/m.m00);
+	 //  white_contour_center.push_back(center);
+  //     Scalar color = Scalar(0, 0, 0);
+	 //  circle( equalized, center, 3, Scalar(0,255,0), -1, 8, 0 );
+  //     drawContours( equalized, white_contours, i, color, 2, 8, white_hierarchy, 0, Point() );
+  //   }
 
   struct Block{
 	double x;
@@ -117,46 +107,52 @@ void SimpleProcessor::Process(cv::Mat frame) {
 	Block(double x, double y, double area) : x(x), y(y), area(area) {}
   };
 
-  vector<Block> blocks;
+  vector<Block> white_blocks;
   /// Draw contours
   //Mat drawing = Mat::zeros( sobelMask.size(), CV_8UC3 );
-  for( int i = 0; i< contours.size(); i++ )
+  for( int i = 0; i< white_contours.size(); i++ )
      {
-	   double contour_area = contourArea(contours[i]);
-	   if(contour_area < 1000) continue;
-	   Moments m = moments(contours[i]);
+	   double contour_area = contourArea(white_contours[i]);
+	   if(contour_area < 100) continue;
+	   Moments m = moments(white_contours[i]);
 	   Point center(m.m10/m.m00,m.m01/m.m00);
-	   contour_center.push_back(center);
-	   blocks.push_back(Block(center.x, center.y, contour_area));
-       Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+	   white_contour_center.push_back(center);
+	   white_blocks.push_back(Block(center.x, center.y, contour_area));
+       Scalar color = Scalar( 255, 255, 255);
 	   circle( equalized, center, 3, Scalar(0,255,0), -1, 8, 0 );
-       drawContours( equalized, contours, i, color, 2, 8, hierarchy, 0, Point() );
+       drawContours( equalized, white_contours, i, color, 2, 8, white_hierarchy, 0, Point() );
      }
 
   //try every combination of 4 blocks and find the ones closest in position and area
-  if(blocks.size() >= 4) {
+  if(white_blocks.size() >= 4) {
 	  vector<int> combos;
 	  vector<int> temp;
 	  Point center;
 	  double dist_squared = 1e10;
-	  int res = gen_comb_norep_lex_init(combos, blocks.size(), 4);
+	  int res = gen_comb_norep_lex_init(combos, white_blocks.size(), 4);
 	  while(res == GEN_NEXT) {
 		//find dist
 		double temp_dist_squared = 0.0f;
+		int horizontal =0, vertical =0;
 		for(int i = 0; i < combos.size(); ++i) {
 			for(int j = i+1; j < combos.size(); ++j) {
-				Block b1 = blocks[combos[i]];
-				Block b2 = blocks[combos[j]];
+				Block b1 = white_blocks[combos[i]];
+				Block b2 = white_blocks[combos[j]];
+				if(abs(b1.x-b2.x) > 10*abs(b1.y-b2.y)){
+					horizontal = 1;
+				} else if(abs(b1.y-b2.y) >10*abs(b1.x-b2.x)){
+					vertical = 1;
+				}
 				temp_dist_squared += (b1.area - b2.area)*(b1.area - b2.area);// + (b1.x-b2.x)*(b1.x-b2.x) + (b1.y-b2.y)*(b1.y-b2.y);
 			}
 		}
-		if(temp_dist_squared < dist_squared) {
+		if(temp_dist_squared < dist_squared & horizontal & vertical) {
 			dist_squared = temp_dist_squared;
 			//find center
 			center.x = center.y = 0;
 			for(int i = 0; i < combos.size(); ++i) {
-				center.x += blocks[combos[i]].x;
-				center.y += blocks[combos[i]].y;
+				center.x += white_blocks[combos[i]].x;
+				center.y += white_blocks[combos[i]].y;
 			}
 			center.x /= combos.size();
 			center.y /= combos.size();
@@ -164,38 +160,12 @@ void SimpleProcessor::Process(cv::Mat frame) {
 			for(int i = 0; i < combos.size(); ++i)
 				temp.push_back(combos[i]);
 		}
-		res = gen_comb_norep_lex_next(combos, blocks.size(), 4);
+		res = gen_comb_norep_lex_next(combos, white_blocks.size(), 4);
 	  }
 	  for(int i = 0; i < temp.size(); ++i)
-		  circle(equalized, Point(blocks[temp[i]].x, blocks[temp[i]].y), 3, Scalar(255, 0, 255), -1, 8);
+		  circle(equalized, Point(white_blocks[temp[i]].x, white_blocks[temp[i]].y), 3, Scalar(255, 0, 255), -1, 8);
 	  circle(equalized, center, 3, Scalar(255,0,0), -1, 8, 0);
   }
 
-  /*if(contour_center.size() > 0) {
-	  //find contour center
-	  Point center(0,0);
-	  for(vector<Point>::const_iterator iter = contour_center.cbegin(); iter != contour_center.cend(); ++iter)
-		center += *iter;
-	  center.x /= contour_center.size();
-	  center.y /= contour_center.size();*/
-	  //circle(equalized, center, 3, Scalar(255,0,0), -1, 8, 0);
-  //}
-
-	/*vector<Vec4i> lines;
-	Mat sobel, sobelX, sobelY;
-Sobel(out,sobelX,CV_8U,1,0);
-Sobel(out,sobelY,CV_8U,0,1);
-sobel = sobelX + sobelY;
-HoughLinesP(sobel, lines, 1, CV_PI/180, 50, 50, 10 );
-  for( size_t i = 0; i < lines.size(); i++ )
-  {
-    Vec4i l = lines[i];
-    line( equalized, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
-  }
-  namedWindow("sobel");
-  imshow("sobel", sobel);*/
-
-
-	//findContours(out, contours, 
 	set_img(equalized);
 }
