@@ -27,6 +27,8 @@ void loop() {
   turnAndShoot(); 
   turnAndShoot(); 
 
+  // TODO: red = stop/done? 
+  // This part not done with QTIs, but with some other sensor on bottom of robot.
 }
 
 long RCTime(int sensorIn){
@@ -82,6 +84,7 @@ void leaveStartingArea(){
   
   // TODO: read when LEDs turn on. 
   // ??? do LEDs affect QTI sensors ???
+  Serial.println("Line following...");
   while (true){
     lineFollow();
     // when all QTIs read white, stop.
@@ -92,8 +95,8 @@ void leaveStartingArea(){
   
   // TODO: now move forward past this boundary.
   // code for moving forward like 2 inches
+  Serial.println("Moving forward past starting boundary line.");
 }
-
 
 
 void turnAndShoot(){
@@ -104,6 +107,7 @@ void turnAndShoot(){
   
   
   // line follow on center line until reach the left turn
+  Serial.println("Line following...");
   while (true){
     lineFollow();
     // when left QTIs read white, stop.
@@ -112,16 +116,19 @@ void turnAndShoot(){
       break;
   }
   // TODO: code for turning left
+  Serial.println("Reached line. Turning left.");
   
   // keep line following until we hit the BLUE square thingy.
   while (true){
     lineFollow();
     // TODO: if read BLUE square thingy, do the shooty thingy.
+    Serial.println("Reached blue square. Shooting target.");
     // then
     break;
   }
   
   // TODO: execute awesome 180 degree turn HERE
+  Serial.println("Done shooting. Turning around/Getting oriented on line.");
   while (true){
     // TODO: turn cw or ccw (idk which), until centered back on line following line.
     // when one of the middle QTIs read white and others still read black, we are close to centered
@@ -130,7 +137,7 @@ void turnAndShoot(){
       break;
   }
   
-  
+  Serial.println("Line following...");
   // line following back to main line
   while (true){
     lineFollow();
@@ -140,5 +147,6 @@ void turnAndShoot(){
       break;
   }
   // TODO: execute awesome left turn.
+  Serial.println("Reached main line. Turning left.");
 }
 
