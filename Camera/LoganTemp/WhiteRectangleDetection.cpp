@@ -7,6 +7,17 @@
 #include "WhiteRectangleDetection.h"
 
 using namespace cv;
+WhiteRectangleDetection::WhiteRectangleDetection() : FrameProcessor("Output") {
+#ifdef CALIBRATE
+	createTrackbar("hbegin", get_window_name(), &hbegin, 179);
+	createTrackbar("hend", get_window_name(), &hend, 179);
+	createTrackbar("slow", get_window_name(), &slow, 255);
+	createTrackbar("shigh", get_window_name(), &shigh, 255);
+	createTrackbar("vlow", get_window_name(), &vlow, 255);
+	createTrackbar("vhigh", get_window_name(), &vhigh, 255);
+#endif
+}
+
 
 void WhiteRectangleDetection::Process(cv::Mat frame) {
 	flip(frame, frame, 1); //flip frame across y-axis
@@ -94,6 +105,71 @@ void WhiteRectangleDetection::Process(cv::Mat frame) {
 		center += *iter;
 	  center.x /= contour_center.size();
 	  center.y /= contour_center.size();
+	  circle(equalized, center, 3, Scalar(255,0,0), -1, 8, 0);
+  }  struct Block{
+	double x;
+	double y;
+	double area;
+	Block(double x, double y, double area) : x(x), y(y), area(area) {}
+  };
+
+  vector<Block> blocks;
+  /// Draw contours
+  //Mat drawing = Mat::zeros( sobelMask.size(), CV_8UC3 );
+  for( int i = 0; i< contours.size(); i++ )
+     {
+	   double contour_area = contourArea(contours[i]);
+	   if(contour_area < 100) continue;
+	   Moments m = moments(contours[i]);
+	   Point center(m.m10/m.m00,m.m01/m.m00);
+	   contour_center.push_back(center);
+	   blocks.push_back(Block(center.x, center.y, contour_area));
+       Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+	   circle( equalized, center, 3, Scalar(0,255,0), -1, 8, 0 );
+       drawContours( equalized, contours, i, color, 2, 8, hierarchy, 0, Point() );
+     }
+
+  //try every combination of 4 blocks and find the ones closest in position and area
+  if(blocks.size() >= 4) {
+	  vector<int> combos;
+	  vector<int> temp;
+	  Point center;
+	  double dist_squared = 1e10;
+	  int res = gen_comb_norep_lex_init(combos, blocks.size(), 4);
+	  while(res == GEN_NEXT) {
+		//find dist
+		double temp_dist_squared = 0.0f;
+		int horizontal =0, vertical =0;
+		for(int i = 0; i < combos.size(); ++i) {
+			for(int j = i+1; j < combos.size(); ++j) {
+				Block b1 = blocks[combos[i]];
+				Block b2 = blocks[combos[j]];
+				if(abs(b1.x-b2.x) > 10*abs(b1.y-b2.y)){
+					horizontal = 1;
+				} else if(abs(b1.y-b2.y) >10*abs(b1.x-b2.x)){
+					vertical = 1;
+				}
+				temp_dist_squared += (b1.area - b2.area)*(b1.area - b2.area);// + (b1.x-b2.x)*(b1.x-b2.x) + (b1.y-b2.y)*(b1.y-b2.y);
+			}
+		}
+		if(temp_dist_squared < dist_squared & horizontal & vertical) {
+			dist_squared = temp_dist_squared;
+			//find center
+			center.x = center.y = 0;
+			for(int i = 0; i < combos.size(); ++i) {
+				center.x += blocks[combos[i]].x;
+				center.y += blocks[combos[i]].y;
+			}
+			center.x /= combos.size();
+			center.y /= combos.size();
+			temp.clear();
+			for(int i = 0; i < combos.size(); ++i)
+				temp.push_back(combos[i]);
+		}
+		res = gen_comb_norep_lex_next(combos, blocks.size(), 4);
+	  }
+	  for(int i = 0; i < temp.size(); ++i)
+		  circle(equalized, Point(blocks[temp[i]].x, blocks[temp[i]].y), 3, Scalar(255, 0, 255), -1, 8);
 	  circle(equalized, center, 3, Scalar(255,0,0), -1, 8, 0);
   }
 

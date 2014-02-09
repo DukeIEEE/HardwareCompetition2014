@@ -7,11 +7,12 @@
 #include <memory>
 
 #include "Processor.h"
+#include "CombinedProcessor.h"
 
 using namespace cv;
 
 int main() {
-	std::unique_ptr<FrameProcessor> processor(new Processor());
+	std::unique_ptr<FrameProcessor> processor(new Processor());//new WhiteRectangleDetection());
 	CvCapture* capture;
 	Mat frame;
 
