@@ -3,6 +3,6 @@
 
 class Processor: public FrameProcessor {
 public:
-	Processor();
+	Processor() : FrameProcessor("Output") {}
 	virtual void Process(cv::Mat frame);
 };

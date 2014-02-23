@@ -9,7 +9,12 @@
 
 using namespace cv;
 
-Processor::Processor(): FrameProcessor("Output") {}
+struct Block{
+  double x;
+  double y;
+  double area;
+  Block(double x, double y, double area) : x(x), y(y), area(area) {}
+};
 
 void Processor::Process(cv::Mat frame) {
 	flip(frame, frame, 1); //flip frame across y-axis
@@ -23,58 +28,28 @@ void Processor::Process(cv::Mat frame) {
 	inRange(hsv, Scalar(0, 0, 0), Scalar(255, 131, 255), mask_B);
 	mask_sam = ~mask_A & ~mask_B;
 
-	imshow("Sam Mask", mask_sam);
-
-	//--------------------------------------------------------------------------------------------------------------------------------Sobel
-
-	//split image for sobel processing
-	vector<Mat> planes;
-	split(equalized, planes);
-	Mat sobelR, sobelG, sobelB, sobelSat, sobelMask;
-	//calculate sobel for red, green, and blue planes
-	generateSobelMask(planes[0], sobelB, 230);
-	generateSobelMask(planes[1], sobelG, 230);
-	generateSobelMask(planes[2], sobelR, 230);
-
-	planes.clear();
-	split(hsv, planes);
-	//calculate for saturation plane as well
-	generateSobelMask(planes[1], sobelSat, 230);
-
-	//combine the masks
-	sobelMask = .6 * sobelR + .6 * sobelG + .6 * sobelB + .6 * sobelSat;
+	//imshow("Sam Mask", mask_sam);
 
 	//--------------------------------------------------------------------------------------------------------------------------------Contours
 
-	vector<vector<Point>> contours;
+	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
-
-	vector<Point> contour_center;
 
 	RNG rng(12345);
 	/// Find contours
 	findContours(mask_sam, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-	
-
-	struct Block{
-		double x;
-		double y;
-		double area;
-		Block(double x, double y, double area) : x(x), y(y), area(area) {}
-	};
-
 	vector<Block> blocks;
-	/// Draw contours
-	//Mat drawing = Mat::zeros( sobelMask.size(), CV_8UC3 );
+	// Calculate contour centroids
 	for (int i = 0; i< contours.size(); i++)
 	{
 		double contour_area = contourArea(contours[i]);
-		if (contour_area < 1000) continue;
+		if (contour_area < 1000) continue; //filter by area
 		Moments m = moments(contours[i]);
 		Point center(m.m10 / m.m00, m.m01 / m.m00);
-		contour_center.push_back(center);
 		blocks.push_back(Block(center.x, center.y, contour_area));
+    
+    //draw contour and centroid
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 		circle(equalized, center, 3, Scalar(0, 255, 0), -1, 8, 0);
 		drawContours(equalized, contours, i, color, 2, 8, hierarchy, 0, Point());
