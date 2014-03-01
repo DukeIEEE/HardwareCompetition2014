@@ -4,7 +4,7 @@ Serial client operates on a computer that connects to serial manager running on 
 import socket
 import sys
 
-PORT = 8888
+PORT = 8889
 
 if len(sys.argv) <= 1:
   print('Usage: python serial_client.py [server_ip]')

@@ -10,7 +10,7 @@ import sys
 
 import subprocess
 
-PORT = 8888
+PORT = 8889
 EXE = 'ls'
 DEBUG = True
 
@@ -36,9 +36,10 @@ def exe(x):
   return s.stdout.read()
 
 def output(text, log=True):
+  text = text + '\n'
   if DEBUG:
     global conn
-    conn.sendall(text)
+    conn.send(text)
   
   if log:
     global logger
@@ -47,6 +48,7 @@ def output(text, log=True):
 #initialize socket first so that we can print Arduino connection data 
 
 if DEBUG:
+  print("Opening port {0}".format(PORT))
   try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('',PORT))
@@ -55,37 +57,40 @@ if DEBUG:
     print('Connected with ' + addr[0] + ':' + str(addr[1]))
   except: 
     print('Socket connection failed')
+    s.close()
     sys.exit()
 
 logger = open('log.txt', 'w')
     
 output('Connecting to Arduino...')
-ser = serial.begin('/dev/ttyACM0', 9600, timeout=2) #Arduino Uno is /dev/ttyACM0
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=2) #Arduino Uno is /dev/ttyACM0
 output('Arduino connected...')
 
 while True:
   line = ser.readline()
   if not line:
     continue
-  
+  line = line.strip()
   output('Uno:' + line)
+  if DEBUG:
+    print(line)
   #we cannot afford to have serial_manager crash during execution!
   try:
     if line.startswith('!'): #command from Arduino
       if line == '!exit': break #done with everything
+      line = line[1:]
       tokens = line.split(' ')
       if tokens[0] in command_list:
         result = command_list[tokens[0]](tokens[1:])
         output('Pi:' + result)
-        ser.write(result)
+        #user.write(result)
       else:
         output('Unrecognized command: ' + tokens[0])
   except:
     e = sys.exec_info()[0]
     output('Exception: ' + e)
-  output('\n')
-  ser.write('\n')
 
 if DEBUG:  
   conn.close()
+  s.close()
 logger.close()

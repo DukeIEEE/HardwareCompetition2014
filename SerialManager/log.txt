@@ -1,0 +1,269 @@
+Connecting to Arduino...
+Arduino connected...
+Uno:begiin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:running
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
+Uno:begin loop
+Uno:!ping
+Pi:Success
+Uno:!exe ls
+Pi:ArduinoTestClient
+log.txt
+serial_client.py
+serial_manager.py
+
+Uno:!exe echo hi
+Pi:
+
