@@ -7,6 +7,7 @@ All other output from Arduino is considered debugging output and is sent to the 
 import serial
 import socket
 import sys
+import traceback
 
 import subprocess
 
@@ -34,6 +35,11 @@ def target_coords(*x):
 def exe(x):
   s = subprocess.Popen(x, shell=True, stdout=subprocess.PIPE)
   return s.stdout.read()
+
+@command
+def add(x):
+  a = int(x[0])
+  return str(a + 1)
 
 def output(text, log=True):
   text = text + '\n'
@@ -87,8 +93,8 @@ while True:
       else:
         output('Unrecognized command: ' + tokens[0])
   except:
-    e = sys.exec_info()[0]
-    output('Exception: ' + e)
+    var = traceback.format_exc()
+    output(var)
 
 if DEBUG:  
   conn.close()
