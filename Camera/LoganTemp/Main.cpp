@@ -7,6 +7,8 @@
 #include <memory>
 
 #include "Processor.h"
+#include "SimpleProcessor.h"
+#include "WhiteRectangleDetection.h"
 #include "CombinedProcessor.h"
 
 using namespace cv;
@@ -36,7 +38,7 @@ int main() {
 		}
 
 		processor->Display();
-		int c = waitKey(10);
+		int c = waitKey(100);
 		if ((char)c == 'q') {
 			break;
 		}

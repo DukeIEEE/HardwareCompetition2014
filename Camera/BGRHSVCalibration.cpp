@@ -51,6 +51,76 @@ const string windowName2 = "Thresholded Image";
 const string windowName3 = "After Morphological Operations";
 const string trackbarWindowName = "Trackbars";
 
+
+bool isFirstRun;
+
+Scalar redLow;
+Scalar redHigh;
+Scalar whiteLow;
+Scalar whiteHigh;
+
+Vec3b averageRedHSV;
+Vec3b redTolerance;
+Vec3b averageWhiteHSV;
+Vec3b whiteTolerance;
+
+//functions----------------------------------------------------------------
+
+Vec3b toVec3b(Scalar s) {
+	Vec3b vec;
+	for (int i = 0; i < 3; i++) {
+		vec.val[i] = s.val[i];
+	}
+	return vec;
+}
+
+Scalar toScalar(Vec3b vec) {
+	Scalar s;
+	for (int i = 0; i < 3; i++) {
+		s.val[i] = vec.val[i];
+	}
+	return s;
+}
+
+bool areEqual(Vec3b v1, Vec3b v2) {
+	for (int i = 0; i < 3; i++) {
+		if (v1.val[i] != v2.val[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool isWithin(Vec3b vec, Vec3b previousVec, Vec3b tolerance) {
+	Vec3b lower = previousVec - tolerance;
+	Vec3b upper = previousVec + tolerance;
+	//works because vec.val[i] cannot be lower than 0
+	return ((vec - upper) == Vec3b(0, 0, 0)) && ((lower - vec) == Vec3b(0, 0, 0));
+}
+
+Vec3b getAverage(Mat img, Vec3b previousAverage, Vec3b tolerance) {
+	int rows = img.rows;
+	int cols = img.cols;
+
+	Vec3b sum = Vec3b(0, 0, 0);
+	int numPixels = 0;
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			Vec3b pixelVals = img.at<Vec3b>(i, j);
+			if (isWithin(pixelVals, previousAverage, tolerance)) {
+				sum += img.at<Vec3b>(i, j);
+				numPixels++;
+			}
+		}
+	}
+
+	if (numPixels < rows * cols / 10) { //at least 10% of pixels
+		return previousAverage;
+	}
+	return sum / numPixels;
+}
+
+
 void on_trackbar(int, void*)
 {//This function gets called whenever a
 	// trackbar position is changed
@@ -80,7 +150,7 @@ void createTrackbars(){
 	createTrackbar("V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar);
 }
 
-int main() {
+int main0() {
 	//Matrix to store each frame of the webcam feed
 	Mat cameraFeed;
 	//matrix storage for HSV image
@@ -100,17 +170,15 @@ int main() {
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
 	//start an infinite loop where webcam feed is copied to cameraFeed matrix
 	//all of our operations will be performed within this loop
-	while (1){
-		//store image to matrix
-		capture.read(cameraFeed);
-		//convert frame from BGR to HSV colorspace
 
-		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
+	int r1, r2, b1, b2, g1, g2;
+	Vec3b avg, t;
+	Mat mask1, mask2, mask3, mask4;
+
+	while (1){
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
-		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-
-		imshow(windowName2, threshold);
+		//inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);waitKey(100);
 
 		if (firstrun) {
 			firstrun = 0;
@@ -118,6 +186,39 @@ int main() {
 			moveWindow(windowName1, x, 0);
 			moveWindow(windowName2, 0, y);
 			moveWindow(windowName3, x, y);
+
+			while (true) {
+				capture.read(cameraFeed);
+
+				cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
+				inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+				imshow(windowName2, threshold);
+				if ((char)waitKey(100) == ' ') {
+					b1 = H_MIN;
+					b2 = H_MAX;
+					g1 = S_MIN;
+					g2 = S_MAX;
+					r1 = V_MIN;
+					r2 = V_MAX;
+					avg = toVec3b(Scalar((b1 + b2) / 2, (g1 + g2) / 2, (r1 + r2) / 2));
+					t = toVec3b(Scalar((b2 - b1) / 2, (g2 - g1) / 2, (r2 - r1) / 2));
+					break;
+				}
+			}
+		}
+		else {
+			capture.read(cameraFeed);
+
+			cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
+			//avg = getAverageHSV(cameraFeed, avg, t);
+			inRange(HSV, Scalar(8, 0, 0), Scalar(127, 255, 255), mask1);
+			inRange(HSV, Scalar(0, 0, 64), Scalar(255, 131, 255), mask2);
+			inRange(cameraFeed, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), mask3);
+			//inRange(cameraFeed, Scalar(0, 0, 100), Scalar(255, 255, 255), mask4);
+			threshold = ~mask1 & ~mask2 & ~mask3;
+			erode(threshold, threshold, Mat());
+			dilate(threshold, threshold, Mat());
+			imshow(windowName2, threshold);
 		}
 
 		int key = waitKey(100);

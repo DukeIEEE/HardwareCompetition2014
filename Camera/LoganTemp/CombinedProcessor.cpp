@@ -40,7 +40,7 @@ void CombinedProcessor::Process(cv::Mat frame) {
 	red_mask = red_mask1;// | red_mask2;
 
 #ifdef CALIBRATE_WHITE_MASK
-	inRange(hsv, Scalar(hbegin, slow, vlow), Scalar(hend, shigh, vhigh), white_mask);
+	inRange(hsv, Scalar(hbegin, slow, vlow), Scalar(hend, shigh, vhigh), white_mask);//8-79,0-37,196-255
 #else
 	inRange(hsv, Scalar(83,5,186), Scalar(148,127,255), white_mask);
 #endif

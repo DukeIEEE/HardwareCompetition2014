@@ -9,9 +9,13 @@
 
 using namespace cv;
 
-Processor::Processor(): FrameProcessor("Output") {}
+Processor::Processor() : FrameProcessor("Output") {
+	createTrackbar("areaWeight", get_window_name(), &areaWeight, 50);
+	createTrackbar("distanceWeight", get_window_name(), &distanceWeight, 50);
+}
 
 void Processor::Process(cv::Mat frame) {
+
 	flip(frame, frame, 1); //flip frame across y-axis
 	Mat equalized = equalizeIntensity(frame);
 	Mat hsv; //hold hsv components
@@ -23,26 +27,11 @@ void Processor::Process(cv::Mat frame) {
 	inRange(hsv, Scalar(0, 0, 0), Scalar(255, 131, 255), mask_B);
 	mask_sam = ~mask_A & ~mask_B;
 
-	imshow("Sam Mask", mask_sam);
+	Mat mask;
+	erode(mask_sam, mask, Mat());
+	dilate(mask, mask, Mat());
 
-	//--------------------------------------------------------------------------------------------------------------------------------Sobel
-
-	//split image for sobel processing
-	vector<Mat> planes;
-	split(equalized, planes);
-	Mat sobelR, sobelG, sobelB, sobelSat, sobelMask;
-	//calculate sobel for red, green, and blue planes
-	generateSobelMask(planes[0], sobelB, 230);
-	generateSobelMask(planes[1], sobelG, 230);
-	generateSobelMask(planes[2], sobelR, 230);
-
-	planes.clear();
-	split(hsv, planes);
-	//calculate for saturation plane as well
-	generateSobelMask(planes[1], sobelSat, 230);
-
-	//combine the masks
-	sobelMask = .6 * sobelR + .6 * sobelG + .6 * sobelB + .6 * sobelSat;
+	//imshow("Sam Mask", mask);
 
 	//--------------------------------------------------------------------------------------------------------------------------------Contours
 
@@ -53,7 +42,7 @@ void Processor::Process(cv::Mat frame) {
 
 	RNG rng(12345);
 	/// Find contours
-	findContours(mask_sam, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+	findContours(mask, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
 	
 
@@ -85,20 +74,37 @@ void Processor::Process(cv::Mat frame) {
 		vector<int> combos;
 		vector<int> temp;
 		Point center;
-		double dist_squared = 1e10;
+		double dist_squared = INFINITY;
+		double area_squared = INFINITY;
 		int res = gen_comb_norep_lex_init(combos, blocks.size(), 4);
 		while (res == GEN_NEXT) {
 			//find dist
 			double temp_dist_squared = 0.0f;
+			double temp_area_squared = 0.0f;
+			int horizontal = 0;
+			int vertical = 0;
 			for (int i = 0; i < combos.size(); ++i) {
 				for (int j = i + 1; j < combos.size(); ++j) {
 					Block b1 = blocks[combos[i]];
 					Block b2 = blocks[combos[j]];
-					temp_dist_squared += (b1.area - b2.area)*(b1.area - b2.area);// + (b1.x-b2.x)*(b1.x-b2.x) + (b1.y-b2.y)*(b1.y-b2.y);
+#ifdef HORIZONTAL_VERTICAL
+					if (abs(b1.x - b2.x) > 5 * abs(b1.y - b2.y)){
+						horizontal++;
+					}
+					else if (abs(b1.y - b2.y) >5 * abs(b1.x - b2.x)){
+						vertical++;
+					}
+#endif
+					temp_dist_squared += distanceWeight*((b1.x - b2.x)*(b1.x - b2.x) + (b1.y - b2.y)*(b1.y - b2.y))*((b1.x - b2.x)*(b1.x - b2.x) + (b1.y - b2.y)*(b1.y - b2.y)) + areaWeight*(b1.area - b2.area)*(b1.area - b2.area);//areaweight=1, distweight=2
 				}
+
 			}
+#ifdef HORIZONTAL_VERTICAL
+			temp_dist_squared *= 1 / 4 * (abs(2 - horizontal) + abs(2 - vertical)) + 1;
+#endif
 			if (temp_dist_squared < dist_squared) {
 				dist_squared = temp_dist_squared;
+				area_squared = temp_area_squared;
 				//find center
 				center.x = center.y = 0;
 				for (int i = 0; i < combos.size(); ++i) {
