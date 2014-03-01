@@ -83,7 +83,7 @@ while True:
       if tokens[0] in command_list:
         result = command_list[tokens[0]](tokens[1:])
         output('Pi:' + result)
-        #user.write(result)
+        ser.write(result)
       else:
         output('Unrecognized command: ' + tokens[0])
   except:
