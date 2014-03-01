@@ -23,14 +23,17 @@ total_error = 0
 for key,value in data.items():
   print("Running on " + key + "...")
   s = subprocess.Popen([EXE, os.path.join(PATH,key)], shell=True, stdout=subprocess.PIPE)
-  res = s.stdout.read().split(',')
+  blah = str(s.stdout.read(),encoding='utf-8')
+  res = blah.split(',')
   x = float(res[0])
   y = float(res[1])
   tx = value[0]
   ty = value[1]
   
   error = (x - tx)*(x - tx) + (y - ty)*(y - ty)
-  print("Error: {0}".format(error))
+  print("True: ({0},{1})".format(tx, ty))
+  print("Detected: ({0},{1})".format(x,y))
+  print("Error: {0}\n".format(error))
   
   total_error = error + total_error
 

@@ -22,9 +22,8 @@ struct Block{
 };
 
 void Processor::Process(cv::Mat frame) {
-
-	flip(frame, frame, 1); //flip frame across y-axis
-	Mat equalized = equalizeIntensity(frame);
+	//flip(frame, frame, 1); //flip frame across y-axis
+	Mat equalized = frame.clone();// equalizeIntensity(frame);
 	Mat hsv; //hold hsv components
 	cvtColor(equalized, hsv, CV_BGR2HSV);
 
@@ -118,8 +117,10 @@ void Processor::Process(cv::Mat frame) {
 		for (int i = 0; i < temp.size(); ++i)
 			circle(equalized, Point(blocks[temp[i]].x, blocks[temp[i]].y), 3, Scalar(255, 0, 255), -1, 8);
 		circle(equalized, center, 3, Scalar(255, 0, 0), -1, 8, 0);
-		std::cout << center.x << "," << center.y;
+		std::cout << center.x << "," << center.y <<std::endl;
+		set_img(equalized);
+		return;
 	}
-
+	std::cout << "0,0" << std::endl;
 	set_img(equalized);
 }

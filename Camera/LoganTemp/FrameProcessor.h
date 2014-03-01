@@ -1,12 +1,15 @@
 #pragma once
 
+//#define SHOW_IMAGES
 class FrameProcessor {
 private:
 	const std::string window_name;
 	cv::Mat img;
 public:
 	explicit FrameProcessor(std::string window_name) : window_name(window_name) {
+#ifdef SHOW_IMAGES
 		cv::namedWindow(window_name);
+#endif
 	}
 	//FrameProcessor() : FrameProcessor("Unnamed window") {}
 	virtual void Process(cv::Mat)=0;
