@@ -14,6 +14,13 @@ Processor::Processor() : FrameProcessor("Output") {
 	createTrackbar("distanceWeight", get_window_name(), &distanceWeight, 50);
 }
 
+struct Block{
+  double x;
+  double y;
+  double area;
+  Block(double x, double y, double area) : x(x), y(y), area(area) {}
+};
+
 void Processor::Process(cv::Mat frame) {
 
 	flip(frame, frame, 1); //flip frame across y-axis
@@ -35,35 +42,24 @@ void Processor::Process(cv::Mat frame) {
 
 	//--------------------------------------------------------------------------------------------------------------------------------Contours
 
-	vector<vector<Point>> contours;
+	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
-
-	vector<Point> contour_center;
 
 	RNG rng(12345);
 	/// Find contours
 	findContours(mask, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-	
-
-	struct Block{
-		double x;
-		double y;
-		double area;
-		Block(double x, double y, double area) : x(x), y(y), area(area) {}
-	};
-
 	vector<Block> blocks;
-	/// Draw contours
-	//Mat drawing = Mat::zeros( sobelMask.size(), CV_8UC3 );
+	// Calculate contour centroids
 	for (int i = 0; i< contours.size(); i++)
 	{
 		double contour_area = contourArea(contours[i]);
-		if (contour_area < 1000) continue;
+		if (contour_area < 1000) continue; //filter by area
 		Moments m = moments(contours[i]);
 		Point center(m.m10 / m.m00, m.m01 / m.m00);
-		contour_center.push_back(center);
 		blocks.push_back(Block(center.x, center.y, contour_area));
+    
+    //draw contour and centroid
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 		circle(equalized, center, 3, Scalar(0, 255, 0), -1, 8, 0);
 		drawContours(equalized, contours, i, color, 2, 8, hierarchy, 0, Point());

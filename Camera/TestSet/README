@@ -1,0 +1,39 @@
+Okay so this folder contains images to use for testing the algorithm. -Logan
+
+=========================
+cross-validation vs test
+=========================
+The images are split into cross-validation and test folders. I basically randomly chose the images taken and split them into the folders. The idea is to choose the algorithm that runs the best on cross-validation set and then run it again on the test set to give an estimate of the accuracy.
+
+=========================
+compile_set.py
+=========================
+Usage: python compile_set.py [directory] [results_file_name]
+directory - directory to look for folder; default is current directory
+results_file_name - name of the results file; default is results.txt
+
+This generates a CSV file with filename and location of the center of the target. This file will be placed in the same directory as the images. The script displays each image and allows the user to click on the location of the center. Use 'Z' to go to the previous image and 'X' to go to the next image. Pres Esc to quit and save the current data. 
+
+The script looks for a preexisting results file. If it finds one, it loads the pre-existing data and displays images for which data does not exist first before the images for which data already exists.
+
+No data is saved until Esc is pressed. When Esc is pressed, an old data is wiped out.
+
+For now, I have simply run
+python compile_set.py cross-validation
+python compile_set.py test
+to produce results file for the two folders.
+
+=========================
+test_algorithm.py
+=========================
+Usage: python test_algorithm.py [directory] [process] [results_file_name]
+directory - directory where images and results file are stored
+process - name of the process that processes the images
+results_file_name - name of the results file produced by compile_set.py
+
+This program repeatedly calls the image processor on the files in the results file and computes the average error. Note that the process must output the position of the center separated by commas to standard output. DumbProcessor is a windows process that spits out a constant position. Use it for testing purposes.
+
+=========================
+resize_images.py
+=========================
+This resizes all image files in the current directory. Currently works only on jpegs. Modify source code to support other file extensions.

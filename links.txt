@@ -1,0 +1,11 @@
+Random useful links
+
+blah blah blah
+
+http://elinux.org/RPi_Debian_Auto_Login
+http://www.raspberrypi.org/forum/viewtopic.php?f=66&t=59960
+
+http://pyserial.sourceforge.net/pyserial.html
+http://raspberrypi.stackexchange.com/questions/1505/how-to-attach-an-arduino
+
+http://rasspberrypi.wordpress.com/2012/09/04/mounting-and-unmounting-usb-drives-on-raspberry-pi/
