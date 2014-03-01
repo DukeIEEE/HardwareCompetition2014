@@ -118,6 +118,7 @@ void Processor::Process(cv::Mat frame) {
 		for (int i = 0; i < temp.size(); ++i)
 			circle(equalized, Point(blocks[temp[i]].x, blocks[temp[i]].y), 3, Scalar(255, 0, 255), -1, 8);
 		circle(equalized, center, 3, Scalar(255, 0, 0), -1, 8, 0);
+		std::cout << center.x << "," << center.y;
 	}
 
 	set_img(equalized);
