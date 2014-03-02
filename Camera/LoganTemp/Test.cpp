@@ -21,6 +21,6 @@ int main(int argc, char**argv) {
 		processor->Process(img);
 	//processor->Display();
 	//std::cout << "done" << std::endl;
-	waitKey(0);
+	//waitKey(0);
 	return 0;
 }

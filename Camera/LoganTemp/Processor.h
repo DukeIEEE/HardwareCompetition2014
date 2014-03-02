@@ -1,6 +1,6 @@
 #pragma once
 #include "FrameProcessor.h"
-#define HORIZONTAL_VERTICAL
+//#define HORIZONTAL_VERTICAL
 
 class Processor : public FrameProcessor {
 private:

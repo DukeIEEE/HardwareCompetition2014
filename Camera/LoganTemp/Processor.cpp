@@ -36,9 +36,9 @@ void Processor::Process(cv::Mat frame) {
 	Mat mask;
 	erode(mask_sam, mask, Mat());
 	dilate(mask, mask, Mat());
-
-	//imshow("Sam Mask", mask);
-
+#ifdef SHOW_IMAGES
+	imshow("Sam Mask", mask);
+#endif
 	//--------------------------------------------------------------------------------------------------------------------------------Contours
 
 	vector<vector<Point> > contours;
@@ -53,7 +53,7 @@ void Processor::Process(cv::Mat frame) {
 	for (int i = 0; i< contours.size(); i++)
 	{
 		double contour_area = contourArea(contours[i]);
-		if (contour_area < 1000) continue; //filter by area
+		if (contour_area < 100) continue; //filter by area
 		Moments m = moments(contours[i]);
 		Point center(m.m10 / m.m00, m.m01 / m.m00);
 		blocks.push_back(Block(center.x, center.y, contour_area));
