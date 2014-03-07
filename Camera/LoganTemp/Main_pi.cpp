@@ -18,7 +18,7 @@ int main(int argc,  char**argv) {
   }
 	FrameProcessor* processor = new Processor();
   
-  std::cout << "Reading input from " << argv[1] << std::endl;
+  //std::cout << "Reading input from " << argv[1] << std::endl;
 	Mat frame = imread(argv[1]);
   if (!frame.empty())
     processor->Process(frame);
@@ -27,7 +27,9 @@ int main(int argc,  char**argv) {
     return 1;
   }
 
-  std::cout << "Writing output to " << argv[2] << std::endl;
-  imwrite(argv[2], frame);
+  //std::cout << "Writing output to " << argv[2] << std::endl;
+  char name[1000];
+  sprintf(name, "output\\%s.out.jpg", argv[1]);
+  imwrite(name, processor->get_img());
 	return 0;
 }
