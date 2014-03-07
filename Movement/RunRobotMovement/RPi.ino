@@ -1,9 +1,9 @@
-char RPi_buffer[20];
-int RPi_target_x, RPi_target_y;
+
+
 boolean RPi_check() {
   RPi_buffer[0] = 0;
   Serial.println("!ping");
-  Serial.setTimeout(3000);
+  Serial.setTimeout(1000);
   int res = Serial.readBytesUntil('\n', RPi_buffer, 20);
   if(res > 0)
     Serial.println(RPi_buffer);
@@ -15,11 +15,15 @@ boolean RPi_check() {
 }
 
 void RPi_getTargetCoords() {
-  boolean worked = false;
-  while(!worked) {
+  int tries = 0;
+  RPi_target_x = RPi_target_y = 0;
+  while(RPi_target_x == 0 || RPi_target_y == 0) {
     Serial.println("!target_coords");
-    Serial.readBytesUntil('\n', RPi_buffer, 20);
+    RPi_target_x = Serial.parseInt();
+    RPi_target_y = Serial.parseInt();  
+    ++tries;
+    if(tries > 20)
+      break;
   }
 }
-
 

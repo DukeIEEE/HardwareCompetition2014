@@ -28,7 +28,7 @@ def ping(*x):
   
 @command
 def target_coords(*x):
-  subprocess.call(['raspistill','-o','out.jpg','-t','1'], shell=True)
+  subprocess.call(['raspistill','-o','out.jpg','-t','1','-w','1280','-h','960'], shell=True)
   s = subprocess.Popen([EXE], shell=True, stdout=subprocess.PIPE)
   return s.stdout.read()
   

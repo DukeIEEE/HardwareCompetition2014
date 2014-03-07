@@ -30,15 +30,16 @@ QTI qti[] = {QTI(PIN_LEFT_QTI), QTI(PIN_CENTER_LEFT_QTI), QTI(PIN_CENTER_RIGHT_Q
 //ColorSensor color_sensor(PIN_COLOR_SENSOR, PIN_COLOR_SENSOR_UNUSED);
 Servo left_servos, right_servos;
 
+//raspberry pi stuff
+char RPi_buffer[20];
+int RPi_target_x, RPi_target_y;
+
 long photo_threshold = 0;
 void setup() {
   delay(1000);
   Serial.begin(9600);
-    
-  //prevent motor from running
-  pinMode(PIN_FIRE, OUTPUT);
-  digitalWrite(PIN_FIRE, LOW);
   
+  setupGun();
   setupPhotoSensor();
 
   left_servos.attach(PIN_LEFT_MOTOR);
@@ -58,8 +59,9 @@ void loop() {
   Serial.println("Running");
   //waitForKeyboard();
 
-  leaveStartingArea();
-  
+  //leaveStartingArea();
+  aimAndFire();
+  stall();
   // turn to targets 1, 2, 3, and shoot them.
   // then turn back to main line.
   turnAndShoot(); 
@@ -145,7 +147,7 @@ void stopMotor() {
 }
 
 void rotateLeft() {
-  forward(100);
+  forward(150);
   left_servos.write(80);
   right_servos.write(20);
   //forward(1500);
@@ -155,7 +157,7 @@ void rotateLeft() {
   delay(250);
   while(!qti[1].isWhite()) {}
   Serial.println(millis() - time);*/
-  delay(1600);
+  delay(1640);
 }
 
 void rotateRight() {
@@ -224,15 +226,17 @@ void turnAndShoot(){
   Serial.println("Reached line. Turning left.");
 
   rotateLeft();
+  
+  backward(2200);
 
-  // keep line following until we hit the BLUE square thingy.
   while (true){
     lineFollowReverse();
     if(qti[1].isWhite() && qti[2].isWhite())
       break;
   }
   Serial.println("Reached white line");
-  
+  stopMotor();
+stall();
   backward(500);
   
   while (true){
