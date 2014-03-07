@@ -7,9 +7,11 @@
 
 #include "Processor.h"
 
+#define INFINITY 1e20
+
 using namespace cv;
 
-Processor::Processor() : FrameProcessor("Output") {
+Processor::Processor() : FrameProcessor("Output"), trackbarWindowName("area/distance"), areaWeight(1), distanceWeight(2) {
 	createTrackbar("areaWeight", get_window_name(), &areaWeight, 50);
 	createTrackbar("distanceWeight", get_window_name(), &distanceWeight, 50);
 }

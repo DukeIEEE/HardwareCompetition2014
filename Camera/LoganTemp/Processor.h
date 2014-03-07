@@ -4,8 +4,8 @@
 
 class Processor : public FrameProcessor {
 private:
-	std::string trackbarWindowName = "area/distance";
-	int areaWeight = 1, distanceWeight =2;
+	std::string trackbarWindowName;
+	int areaWeight, distanceWeight;
 public:
 	Processor();
 	virtual void Process(cv::Mat frame);
