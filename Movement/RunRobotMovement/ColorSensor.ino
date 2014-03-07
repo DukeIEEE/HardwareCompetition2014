@@ -102,7 +102,12 @@ void ColorSensor::update()
       }
       delay(1);
     }
+    delay(80);
   }
+  Serial.println("failed");
+  serin.end();
+  prepare(); //redo setup sensor
+  delay(200);
 }
 
 void ColorSensor::averageColorState()
@@ -115,9 +120,9 @@ void ColorSensor::averageColorState()
   for(int i = 0; i < numIterations; i++)
   {
      update();
-     a += current_color_state[0] / numIterations;
-     b += current_color_state[1] / numIterations;
-     c += current_color_state[2] / numIterations;
+     a += current_color_state[0];
+     b += current_color_state[1];
+     c += current_color_state[2];
   }
   
   current_color_state[0] = a;
@@ -134,7 +139,7 @@ void ColorSensor::averageColorState()
 //RETURN VALUES:  0 = Black, 1=White, 2=Orange, 3=Yellow, 4=Green, 5=Blue, 6=Brown, 7=Red,8=Unknown
 int ColorSensor::interperateColorState()
 {
-  static int colors[][3] = {{0,0,0},{255,255,255},{134,43,63},{130,59,48},{40,49,65},{44,24,80},{67,27,44},{108,24,55}};
+  static int colors[][3] = {{0,0,0},{255,255,255},{134,43,63},{130,59,48},{10,10,65},{44,24,80},{67,27,44},{108,24,55}};
   int bestColor = 0;
   int smallestDiff = 10000;
   for(int i = 0; i < 8; ++i) {
@@ -151,7 +156,7 @@ int ColorSensor::interperateColorState()
 }
 
 int ColorSensor::getColor() {
-  prepare();
+  //prepare();
   
   int c[9]; //stores the counts for each of the colors
   for(int i = 0; i < 9; ++i) //intialize to zero
@@ -160,8 +165,8 @@ int ColorSensor::getColor() {
     averageColorState();
     ++c[interperateColorState()];
   }
-  serin.end();
-  reset();
+  //serin.end();
+  //reset();
   //choose the color with greatest number of counts
   int maxColor = 0;
   for(int i = 0; i < 8; ++i)
