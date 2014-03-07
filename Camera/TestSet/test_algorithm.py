@@ -23,7 +23,10 @@ total_error = 0
 for key,value in data.items():
   print("Running on " + key + "...")
   s = subprocess.Popen([EXE, os.path.join(PATH,key)], shell=True, stdout=subprocess.PIPE)
-  blah = str(s.stdout.read(),encoding='utf-8')
+  if sys.version_info[0] == 3:
+    blah = str(s.stdout.read(),encoding='utf-8')
+  else:
+    blah = str(s.stdout.read())
   res = blah.split(',')
   x = float(res[0])
   y = float(res[1])

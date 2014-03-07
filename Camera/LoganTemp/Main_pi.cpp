@@ -28,6 +28,8 @@ int main(int argc,  char**argv) {
   }
 
   //std::cout << "Writing output to " << argv[2] << std::endl;
-  //imwrite(argv[2], frame);
+  char name[1000];
+  sprintf(name, "output\\%s.out.jpg", argv[1]);
+  imwrite(name, processor->get_img());
 	return 0;
 }

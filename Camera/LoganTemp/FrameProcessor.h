@@ -24,6 +24,9 @@ public:
 	void set_img(cv::Mat img) {
 		this->img = img;
 	}
+	cv::Mat get_img() {
+		return img;
+	}
 };
 
 #include "Utilities.h"
