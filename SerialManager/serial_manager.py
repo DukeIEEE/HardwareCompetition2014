@@ -13,7 +13,7 @@ import subprocess
 
 PORT = 8889
 EXE = 'ls'
-DEBUG = True
+DEBUG = False
 
 #command expected to take arbitrary number of arguments and return a string representing the output
 command_list = {}
@@ -28,6 +28,7 @@ def ping(*x):
   
 @command
 def target_coords(*x):
+  subprocess.call(['raspistill','-o','out.jpg','-t','1'], shell=True)
   s = subprocess.Popen([EXE], shell=True, stdout=subprocess.PIPE)
   return s.stdout.read()
   
@@ -40,6 +41,10 @@ def exe(x):
 def add(x):
   a = int(x[0])
   return str(a + 1)
+  
+@command
+def done(x):
+  subprocess.call(['sudo', 'shutdown', '-h', 'now'])
 
 def output(text, log=True):
   text = text + '\n'

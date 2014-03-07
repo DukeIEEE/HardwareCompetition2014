@@ -34,17 +34,16 @@ long photo_threshold = 0;
 void setup() {
   delay(1000);
   Serial.begin(9600);
-  setupPhotoSensor();
-  delay(1000);
-
-  left_servos.attach(PIN_LEFT_MOTOR);
-  right_servos.attach(PIN_RIGHT_MOTOR);
-  left_servos.write(90);
-  right_servos.write(90);
-  
+    
   //prevent motor from running
   pinMode(PIN_FIRE, OUTPUT);
   digitalWrite(PIN_FIRE, LOW);
+  
+  setupPhotoSensor();
+
+  left_servos.attach(PIN_LEFT_MOTOR);
+  right_servos.attach(PIN_RIGHT_MOTOR);
+  stopMotor();
   
 }
 
@@ -91,6 +90,14 @@ void lineFollow(){
     left_servos.write(120);
     right_servos.write(80);
   }
+  else if(!off[0] && off[1] && off[2] && off[3]) {
+    left_servos.write(100);
+    right_servos.write(10);
+  }
+  else if(off[0] && off[1] && off[2] && !off[3]) {
+    left_servos.write(170);
+    right_servos.write(80);
+  }
 }
 
 void lineFollow(int time) {
@@ -110,11 +117,11 @@ void lineFollowReverse(){
     left_servos.write(80);
     right_servos.write(100);
   }
-  else if(off[0] && !off[1] && off[2] && off[3]) {
+  else if(off[0] && off[1] && !off[2] && off[3]) {
     left_servos.write(60);
     right_servos.write(100);
   }
-  else if(off[0] && off[1] && !off[2] && off[3]) {
+  else if(off[0] && !off[1] && off[2] && off[3]) {
     left_servos.write(80);
     right_servos.write(120);
   }
@@ -138,18 +145,24 @@ void stopMotor() {
 }
 
 void rotateLeft() {
-  forward(1500);
-  left_servos.write(40);
-  right_servos.write(40);
-  delay(1000);
+  forward(100);
+  left_servos.write(80);
+  right_servos.write(20);
+  //forward(1500);
+  //left_servos.write(40);
+  //right_servos.write(40);
+ /* long time  = millis();
+  delay(250);
   while(!qti[1].isWhite()) {}
+  Serial.println(millis() - time);*/
+  delay(1600);
 }
 
 void rotateRight() {
-  forward(1300);
+  forward(1500);
   left_servos.write(140);
   right_servos.write(140);
-  delay(1000);
+  delay(250);
   while(!qti[3].isWhite()) {}
 }
 
@@ -157,11 +170,11 @@ void setupPhotoSensor() {
   pinMode(PIN_PHOTO, INPUT);
   for(int i = 0; i < 100; ++i) {
     photo_threshold += analogRead(PIN_PHOTO);
-    Serial.println(analogRead(PIN_PHOTO));
     delay(10);
   }
   photo_threshold /= 100;
   photo_threshold -= 60;
+  Serial.print("Photo threshold: ");
   Serial.println(photo_threshold);
 }
 
@@ -211,16 +224,28 @@ void turnAndShoot(){
   Serial.println("Reached line. Turning left.");
 
   rotateLeft();
-  
+
   // keep line following until we hit the BLUE square thingy.
-  /*while (true){
-    lineFollow();
-    // TODO: if read BLUE square thingy, do the shooty thingy.
-    Serial.println("Reached blue square. Shooting target.");
-    // then
-    break;
-  }*/
-  lineFollow(1000);
+  while (true){
+    lineFollowReverse();
+    if(qti[1].isWhite() && qti[2].isWhite())
+      break;
+  }
+  Serial.println("Reached white line");
+  
+  backward(500);
+  
+  while (true){
+    lineFollowReverse();
+    if(qti[1].isWhite() && qti[2].isWhite())
+      break;
+  }
+  Serial.println("Found blue block");
+  
+  
+  
+  stopMotor();
+  stall();
   
   // TODO: execute awesome 180 degree turn HERE
   /*Serial.println("Done shooting. Turning around/Getting oriented on line.");
@@ -247,6 +272,16 @@ void turnAndShoot(){
   
   stopMotor();
   stall();
+}
+
+void shoot() {
+  
+}
+
+void getCoord() {
+  
+  Serial.println("!get_coords");
+  
 }
 
 
