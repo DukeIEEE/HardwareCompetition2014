@@ -12,3 +12,13 @@ long RCTime(int sensorIn){
    }
    return duration;
 }
+
+void waitForKeyboard() {
+  while(!Serial.available())
+    ;
+  Serial.read();
+}
+
+void stall() {
+  while(1) delay(10000);
+}

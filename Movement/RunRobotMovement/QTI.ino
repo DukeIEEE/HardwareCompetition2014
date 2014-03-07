@@ -2,7 +2,8 @@
 #include "Utilities.h"
 
 long QTI::UpdateState() {
-  time = RCTime(pin);
+  digitalWrite(pin, HIGH); 
+  time = analogRead(pin);
   return time;
 }
 

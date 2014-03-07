@@ -9,7 +9,7 @@ void loop() {
   Serial.println("begin loop");
   Serial.print(x);
   Serial.println();
-  Serial.print('!add ');
+  Serial.print("!add ");
   Serial.println(x);
   delay(10);
   x = Serial.parseInt();

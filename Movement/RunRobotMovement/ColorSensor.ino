@@ -27,7 +27,8 @@ void ColorSensor::prepare()
   // Now turn the sio pin into an input to read data from the color pal.
   serin.begin(_color_sensor_baud);
   pinMode(pin, INPUT);
-  delay(200);
+  
+  Serial.println("Color sensor prepared");
 }
 
 
@@ -96,9 +97,10 @@ void ColorSensor::update()
         current_color_state[0] += sred;///10;
         current_color_state[1] += sgrn;///10;
         current_color_state[2] += sblu;///10; 
-        delay(10);
+        delay(2);
         return;
       }
+      delay(1);
     }
   }
 }
@@ -121,6 +123,11 @@ void ColorSensor::averageColorState()
   current_color_state[0] = a;
   current_color_state[1] = b;
   current_color_state[2] = c;
+  Serial.print(a);
+  Serial.print(',');
+  Serial.print(b);
+  Serial.print(',');
+  Serial.println(c);
 }
 
 //Fcn that interperates current color state given empirical measurments of color,distance
@@ -145,6 +152,7 @@ int ColorSensor::interperateColorState()
 
 int ColorSensor::getColor() {
   prepare();
+  
   int c[9]; //stores the counts for each of the colors
   for(int i = 0; i < 9; ++i) //intialize to zero
     c[i] = 0;

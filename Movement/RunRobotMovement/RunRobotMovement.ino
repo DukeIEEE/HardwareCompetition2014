@@ -1,13 +1,24 @@
+#include <SoftwareSerial.h>
+#include <Servo.h>
+
 #include "QTI.h"
+#include "ColorSensor.h"
 
 #include "Utilities.h"
 
-#define PIN_LEFT_QTI            3
-#define PIN_CENTER_LEFT_QTI     4
-#define PIN_CENTER_RIGHT_QTI    5
-#define PIN_RIGHT_QTI           6
-#define PIN_COLOR_SENSOR        7
-#define PIN_COLOR_SENSOR_UNUSED 8
+
+#define PIN_LEFT_QTI            A1
+#define PIN_CENTER_LEFT_QTI     A2
+#define PIN_CENTER_RIGHT_QTI    A3
+#define PIN_RIGHT_QTI           A4
+#define PIN_COLOR_SENSOR        4
+#define PIN_COLOR_SENSOR_UNUSED 255
+#define PIN_LEFT_MOTOR          10
+#define PIN_RIGHT_MOTOR         11
+#define PIN_TRIGGER             5
+#define PIN_PLATFORM            6
+#define PIN_TILT                3
+#define PIN_FIRE                2
 
 // picture yourself facing same direction as robot is facing:
 // leftmost QTI - 1, 2, 3, 4 - rightmost QTI
@@ -15,20 +26,35 @@
 // setting QTI input pins
 QTI qti[] = {QTI(PIN_LEFT_QTI), QTI(PIN_CENTER_LEFT_QTI), QTI(PIN_CENTER_RIGHT_QTI), QTI(PIN_RIGHT_QTI)};
 
-ColorSensor color_sensor(PIN_COLOR_SENSOR, PIN_COLOR_SENSOR_UNUSED);
-  
+//ColorSensor color_sensor(PIN_COLOR_SENSOR, PIN_COLOR_SENSOR_UNUSED);
+Servo left_servos, right_servos;
 void setup() {
+  delay(1000);
   Serial.begin(9600);
+  left_servos.attach(PIN_LEFT_MOTOR);
+  right_servos.attach(PIN_RIGHT_MOTOR);
+  left_servos.write(90);
+  right_servos.write(90);
+  
+  //prevent motor from running
+  pinMode(PIN_FIRE, OUTPUT);
+  digitalWrite(PIN_FIRE, LOW);
+  
+  //Serial.println("Preparing color sensor...");
+  //color_sensor.prepare();
 }
 
 void loop() {
-  Serial.println(RCTime(2));	    // Connect to pin 2, display results
-  delay(250);			    // Wait 250ms
   // for voltage source of 3.3 V,
   // BLACK - >300
   // WHITE LINE & RED SQUARE - 5-30
-  
   // movement:
+  //Serial.println(color_sensor.getColor(color_sensor.getColor()));
+  //delay(1000);
+  //return;
+  Serial.println("Running");
+  waitForKeyboard();
+
   leaveStartingArea();
   
   // turn to targets 1, 2, 3, and shoot them.
@@ -36,46 +62,29 @@ void loop() {
   turnAndShoot(); 
   turnAndShoot(); 
   turnAndShoot(); 
-
+  
+  stall();
   // TODO: red = stop/done? 
   // This part not done with QTIs, but with some other sensor on bottom of robot.
 }
    
 void lineFollow(){
-  bool on[4];
-  for(int i = 0; i < 3; ++i)
-    on[i] = qti[i].isWhite();
-   /*
-  if (RCTime(qti1) >= QTI_TIME && RCTime(qti2) >= QTI_TIME && RCTime(qti3) >= QTI_TIME && RCTime(qti4) >= QTI_TIME){
-    // All QTIs read black, therefore:
-    // move straight forward
+  bool off[4];
+  for(int i = 0; i < 4; ++i) {
+    off[i] = qti[i].isBlack();
   }
-  else if ((RCTime(qti1) >= QTI_TIME && RCTime(qti2) < QTI_TIME && RCTime(qti3) >= QTI_TIME && RCTime(qti4) >= 200)){
-    // QTI 2 -> second QTI from left reads white, therefore:
-    // turn slightly to the right
+  if(off[0] && off[1] && off[2] && off[3]) {
+    left_servos.write(100);
+    right_servos.write(80);
   }
-  else if ((RCTime(qti1) < 200 && RCTime(qti2) >= 200 && RCTime(qti3) >= 200 && RCTime(qti4) >= 200)){
-    // QTI 2 -> lefmost QTI, therefore:
-    // turn more to the right
+  else if(off[0] && !off[1] && off[2] && off[3]) {
+    left_servos.write(100);
+    right_servos.write(60);
   }
-  else if ((RCTime(qti1) < 200 && RCTime(qti2) < 200 && RCTime(qti3) >= 200 && RCTime(qti4) >= 200)){
-    // QTI 1 and 2 -> left QTIs read white, therefore:
-    // rotate to the right
+  else if(off[0] && off[1] && !off[2] && off[3]) {
+    left_servos.write(120);
+    right_servos.write(80);
   }
-  else if ((RCTime(qti1) >= 200 && RCTime(qti2) >= 200 && RCTime(qti3) < 200 && RCTime(qti4) >= 200)){
-    // QTI 3 -> second QTI from right reads white, therefore:
-    // turn slightly to the left
-  }
-  else if ((RCTime(qti1) >= 200 && RCTime(qti2) >= 200 && RCTime(qti3) >= 200 && RCTime(qti4) < 200)){
-    // QTI 3 -> rightmost QTI reads white, therefore:
-    // rotate more to the left
-  }
-  else if ((RCTime(qti1) >= 200 && RCTime(qti2) >= 200 && RCTime(qti3) < 200 && RCTime(qti4) < 200)){
-    // QTI 3 and 4 -> right QTIs read white, therefore:
-    // rotate more to the left
-  }
-  else {
-  }*/
 }
 
 void leaveStartingArea(){
@@ -92,8 +101,12 @@ void leaveStartingArea(){
     if (qti[0].isWhite() && qti[1].isWhite() && qti[2].isWhite() && qti[3].isWhite())
       break;
   }
-  
-  // TODO: now move forward past this boundary.
+  Serial.println("Found");
+  //stopMotor();
+  //waitForKeyboard();
+  forward(500);
+  //stopMotor();
+  //waitForKeyboard();
   // code for moving forward like 2 inches
   Serial.println("Moving forward past starting boundary line.");
 }
@@ -112,11 +125,13 @@ void turnAndShoot(){
     lineFollow();
     // when left QTIs read white, stop.
     // this indicates that we are on the left turn.
-    if (qti[0].isWhite() && qti[1].isWhite() && qti[2].isBlack() && qti[3].isBlack())
+    if (/*qti[0].isWhite() && qti[1].isWhite() && */qti[2].isWhite() && qti[3].isWhite()) //left qtis ignored in case there is a block there
       break;
   }
-  // TODO: code for turning left
   Serial.println("Reached line. Turning left.");
+stopMotor();
+waitForKeyboard();
+  rotateLeft();
   
   // keep line following until we hit the BLUE square thingy.
   while (true){
@@ -148,5 +163,24 @@ void turnAndShoot(){
   }
   // TODO: execute awesome left turn.
   Serial.println("Reached main line. Turning left.");
+}
+
+void forward(int time) {
+  left_servos.write(100);
+  right_servos.write(80);
+  delay(time);
+}
+
+void stopMotor() {
+  left_servos.write(90);
+  right_servos.write(90);
+}
+
+void rotateLeft() {
+  forward(500);
+  left_servos.write(150);
+  right_servos.write(30);
+  while(!qti[1].isWhite()) {}
+
 }
 
