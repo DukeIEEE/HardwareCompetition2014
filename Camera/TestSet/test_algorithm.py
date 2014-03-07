@@ -27,7 +27,7 @@ for key,value in data.items():
     blah = str(s.stdout.read(),encoding='utf-8')
   else:
     blah = str(s.stdout.read())
-  res = blah.split(',')
+  res = blah.split(' ')
   x = float(res[0])
   y = float(res[1])
   tx = value[0]
