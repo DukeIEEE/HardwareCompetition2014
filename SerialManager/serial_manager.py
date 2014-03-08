@@ -12,7 +12,7 @@ import traceback
 import subprocess
 
 PORT = 8889
-EXE = 'ls'
+EXE = '~/processor/Main'
 DEBUG = False
 
 #command expected to take arbitrary number of arguments and return a string representing the output
@@ -28,8 +28,8 @@ def ping(*x):
   
 @command
 def target_coords(*x):
-  subprocess.call(['raspistill','-o','out.jpg','-t','1','-w','1280','-h','960'], shell=True)
-  s = subprocess.Popen([EXE], shell=True, stdout=subprocess.PIPE)
+  subprocess.call(['raspistill','-o','out.jpg','-t','1','-w','1280','-h','960'])
+  s = subprocess.Popen([EXE, '~/out.jpg'], shell=True, stdout=subprocess.PIPE)
   return s.stdout.read()
   
 @command
