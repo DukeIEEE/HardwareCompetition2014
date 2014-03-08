@@ -12,7 +12,7 @@ void setupGun() {
   digitalWrite(PIN_FIRE, LOW);
 }
 
-void aim() {
+void aimHorizontal() {
   platform.attach(PIN_PLATFORM);
   
   //align in x direction
@@ -23,17 +23,45 @@ void aim() {
     Serial.println(RPi_target_y);
     
     if(RPi_target_x != 0 && RPi_target_y != 0) {
-      if(RPi_target_x <= CENTER_X)
-        platform.writeMicroseconds(1400);
-      else
-        platform.writeMicroseconds(1600);
-      delay(50);
+      for(int i = 0; i < 50; ++i) {
+        if(RPi_target_x <= CENTER_X)
+          platform.writeMicroseconds(1400);
+        else
+          platform.writeMicroseconds(1600);
+        delay(50);
+      }
       platform.writeMicroseconds(1500);
     } 
     RPi_getTargetCoords();
   }
   
   platform.detach();
+}
+
+void aimVertical() {
+  tilt.attach(PIN_TILT);
+  
+    //align in x direction
+   RPi_getTargetCoords();
+   while(RPi_target_y > CENTER_Y + Y_THRESH || RPi_target_y < CENTER_Y - Y_THRESH) {   
+    Serial.print(RPi_target_x);
+    Serial.print(",");
+    Serial.println(RPi_target_y);
+    
+    if(RPi_target_x != 0 && RPi_target_y != 0) {
+      for(int i = 0; i < 50; ++i) {
+        if(RPi_target_y <= CENTER_Y)
+          tilt.writeMicroseconds(1400);
+        else
+          tilt.writeMicroseconds(1600);
+        delay(50);
+      }
+      tilt.writeMicroseconds(1500);
+    } 
+    RPi_getTargetCoords();
+  }
+  
+  tilt.detach();
 }
 
 void aimAndFire() {

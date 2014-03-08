@@ -1,7 +1,7 @@
 #ifndef QTI_H
 #define QTI_H
 
-#define QTI_THRESHOLD 160 //threshold for reading in black on qtis
+#define QTI_THRESHOLD 400 //threshold for reading in black on qtis
 
 class QTI {
   private:

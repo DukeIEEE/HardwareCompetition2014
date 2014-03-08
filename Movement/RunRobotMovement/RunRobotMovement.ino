@@ -7,25 +7,30 @@
 #include "Utilities.h"
 
 
-#define PIN_LEFT_QTI            A1
-#define PIN_CENTER_LEFT_QTI     A2
-#define PIN_CENTER_RIGHT_QTI    A3
-#define PIN_RIGHT_QTI           A4
-#define PIN_COLOR_SENSOR        4
-#define PIN_COLOR_SENSOR_UNUSED 255
-#define PIN_LEFT_MOTOR          10
-#define PIN_RIGHT_MOTOR         11
-#define PIN_TRIGGER             5
-#define PIN_PLATFORM            6
-#define PIN_TILT                3
-#define PIN_FIRE                2
-#define PIN_PHOTO               A5
+#define PIN_LEFT_QTI                 A1
+#define PIN_CENTER_LEFT_QTI          A2
+#define PIN_CENTER_RIGHT_QTI         A3
+#define PIN_RIGHT_QTI                A4
+#define PIN_LEFT_QTI_BACK            A8
+#define PIN_CENTER_LEFT_QTI_BACK     A9
+#define PIN_CENTER_RIGHT_QTI_BACK    A10
+#define PIN_RIGHT_QTI_BACK           A12
+#define PIN_COLOR_SENSOR             4  
+#define PIN_COLOR_SENSOR_UNUSED      255
+#define PIN_LEFT_MOTOR               10
+#define PIN_RIGHT_MOTOR              11
+#define PIN_TRIGGER                  5
+#define PIN_PLATFORM                 6
+#define PIN_TILT                     3
+#define PIN_FIRE                     2
+#define PIN_PHOTO                    A5
 
 // picture yourself facing same direction as robot is facing:
 // leftmost QTI - 1, 2, 3, 4 - rightmost QTI
 
 // setting QTI input pins
 QTI qti[] = {QTI(PIN_LEFT_QTI), QTI(PIN_CENTER_LEFT_QTI), QTI(PIN_CENTER_RIGHT_QTI), QTI(PIN_RIGHT_QTI)};
+QTI qti_back[] = {QTI(PIN_LEFT_QTI_BACK), QTI(PIN_CENTER_LEFT_QTI_BACK), QTI(PIN_CENTER_RIGHT_QTI_BACK), QTI(PIN_RIGHT_QTI_BACK)};
 
 //ColorSensor color_sensor(PIN_COLOR_SENSOR, PIN_COLOR_SENSOR_UNUSED);
 Servo left_servos, right_servos;
@@ -41,28 +46,40 @@ void setup() {
   
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
-  
+
   setupGun();
-  /*setupPhotoSensor();
 
   left_servos.attach(PIN_LEFT_MOTOR);
   right_servos.attach(PIN_RIGHT_MOTOR);
-  stopMotor*/
-  
+  stopMotor();
+
+  setupPhotoSensor();
+ 
+  //ignore initial qti readings
+  for(int i = 0; i < 10; ++i) {
+    qti[i].UpdateState();
+    qti_back[i].UpdateState();
+  }
+  right_servos.write(60);
+  left_servos.write(60);
+  waitForKeyboard();
 }
 
 void loop() {
   Serial.println("Running");
   //make sure RPi is connected and operating properly
-  while(!RPi_check())
-    delay(1000);
- digitalWrite(13, HIGH);
-  while(1) {
-    aim();
-  }
-  stall();
-
+ 
   //leaveStartingArea();
+  
+  /*while(!RPi_check())
+    delay(1000);
+  digitalWrite(13, HIGH);
+  while(1) {
+    aimVertical();
+    delay(10);
+  }
+  stall();*/
+
 
   // turn to targets 1, 2, 3, and shoot them.
   // then turn back to main line.
@@ -82,24 +99,24 @@ void lineFollow(){
     off[i] = qti[i].isBlack();
   }
   if(off[0] && off[1] && off[2] && off[3]) {
-    left_servos.write(100);
-    right_servos.write(80);
+    left_servos.write(110);
+    right_servos.write(70);
   }
   else if(off[0] && !off[1] && off[2] && off[3]) {
-    left_servos.write(100);
-    right_servos.write(60);
+    left_servos.write(110);
+    right_servos.write(50);
   }
   else if(off[0] && off[1] && !off[2] && off[3]) {
-    left_servos.write(120);
-    right_servos.write(80);
+    left_servos.write(130);
+    right_servos.write(70);
   }
   else if(!off[0] && off[1] && off[2] && off[3]) {
-    left_servos.write(100);
-    right_servos.write(10);
+    left_servos.write(110);
+    right_servos.write(30);
   }
   else if(off[0] && off[1] && off[2] && !off[3]) {
-    left_servos.write(170);
-    right_servos.write(80);
+    left_servos.write(150);
+    right_servos.write(70);
   }
 }
 
@@ -114,19 +131,30 @@ void lineFollow(int time) {
 void lineFollowReverse(){
   bool off[4];
   for(int i = 0; i < 4; ++i) {
-    off[i] = qti[i].isBlack();
+    off[i] = qti_back[i].isBlack();
+    Serial.print(!off[i]);
+    Serial.print(' ');
   }
+  Serial.println();
   if(off[0] && off[1] && off[2] && off[3]) {
     left_servos.write(80);
     right_servos.write(100);
   }
-  else if(off[0] && off[1] && !off[2] && off[3]) {
+  else if(off[0] && !off[1] && off[2] && off[3]) {
     left_servos.write(60);
     right_servos.write(100);
   }
-  else if(off[0] && !off[1] && off[2] && off[3]) {
+  else if(off[0] && off[1] && !off[2] && off[3]) {
     left_servos.write(80);
     right_servos.write(120);
+  }
+    else if(!off[0] && off[1] && off[2] && off[3]) {
+    left_servos.write(30);
+    right_servos.write(110);
+  }
+  else if(off[0] && off[1] && off[2] && !off[3]) {
+    left_servos.write(70);
+    right_servos.write(150);
   }
 }
 
@@ -162,11 +190,12 @@ void rotateLeft() {
 }
 
 void rotateRight() {
-  forward(1500);
+  forward(1000);
   left_servos.write(140);
   right_servos.write(140);
   delay(250);
-  while(!qti[3].isWhite()) {}
+  while(!qti[2].isWhite()) {}
+  delay(500);
 }
 
 void setupPhotoSensor() {
@@ -174,11 +203,21 @@ void setupPhotoSensor() {
   for(int i = 0; i < 100; ++i) {
     photo_threshold += analogRead(PIN_PHOTO);
     delay(10);
+    Serial.println(analogRead(PIN_PHOTO));
   }
   photo_threshold /= 100;
   photo_threshold -= 60;
   Serial.print("Photo threshold: ");
   Serial.println(photo_threshold);
+}
+
+int averagePhotoReading() {
+  int val = 0;
+  for(int i = 0; i < 25; ++i) {
+    val += analogRead(PIN_PHOTO);
+    delay(10);
+  }
+  return val / 25;
 }
 
 void leaveStartingArea(){
@@ -189,9 +228,7 @@ void leaveStartingArea(){
   // ??? do LEDs affect QTI sensors ???
   Serial.println("Photo threshold:");
   Serial.println(photo_threshold);
-  while(analogRead(PIN_PHOTO) > photo_threshold || analogRead(PIN_PHOTO) > photo_threshold) delay(10); //double check
-  Serial.println("Moving forward...");
-  //waitForKeyboard();
+  while(averagePhotoReading() > photo_threshold) delay(10);
   Serial.println("Line following...");
   while (true){
     lineFollow();
@@ -214,7 +251,6 @@ void turnAndShoot(){
   // make that left turn and line-follow to the blue acrylic square, shoot target,
   // move back to main line, then turn left.
   
-  
   // line follow on center line until reach the left turn
   Serial.println("Line following...");
   while (true){
@@ -226,27 +262,27 @@ void turnAndShoot(){
   }
   Serial.println("Reached line. Turning left.");
 
-  rotateLeft();
+  rotateRight();
+  lineFollow(500);
   
-  backward(2200);
-
-  while (true){
-    lineFollowReverse();
-    if(qti[1].isWhite() && qti[2].isWhite())
+  while(true) {
+    lineFollow();
+    if(qti_back[1].isWhite() && qti_back[2].isWhite())
       break;
   }
+  
   Serial.println("Reached white line");
   stopMotor();
-stall();
+  delay(1000);
   backward(500);
   
   while (true){
     lineFollowReverse();
-    if(qti[1].isWhite() && qti[2].isWhite())
+    if(qti_back[1].isWhite() && qti_back[2].isWhite())
       break;
   }
   Serial.println("Found blue block");
-  
+  backward(1300);
   
   
   stopMotor();
