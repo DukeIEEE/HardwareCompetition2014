@@ -39,37 +39,38 @@ void setup() {
   delay(1000);
   Serial.begin(9600);
   
+  pinMode(13, OUTPUT);
+  digitalWrite(13, LOW);
+  
   setupGun();
-  setupPhotoSensor();
+  /*setupPhotoSensor();
 
   left_servos.attach(PIN_LEFT_MOTOR);
   right_servos.attach(PIN_RIGHT_MOTOR);
-  stopMotor();
+  stopMotor*/
   
 }
 
 void loop() {
-  // for voltage source of 3.3 V,
-  // BLACK - >300
-  // WHITE LINE & RED SQUARE - 5-30
-  // movement:
-  //Serial.println(color_sensor.getColor(color_sensor.getColor()));
-  //delay(1000);
-  //return;
   Serial.println("Running");
-  //waitForKeyboard();
+  //make sure RPi is connected and operating properly
+  while(!RPi_check())
+    delay(1000);
+ digitalWrite(13, HIGH);
+  while(1) {
+    aim();
+  }
+  stall();
 
   //leaveStartingArea();
-  aimAndFire();
-  stall();
+
   // turn to targets 1, 2, 3, and shoot them.
   // then turn back to main line.
   turnAndShoot(); 
   turnAndShoot(); 
   turnAndShoot(); 
   
-  // TODO: red = stop/done? 
-  // This part not done with QTIs, but with some other sensor on bottom of robot.
+  findEndingArea();
   
   stopMotor();
   stall();
@@ -251,6 +252,7 @@ stall();
   stopMotor();
   stall();
   
+  aimAndFire();
   // TODO: execute awesome 180 degree turn HERE
   /*Serial.println("Done shooting. Turning around/Getting oriented on line.");
   while (true){
@@ -274,19 +276,17 @@ stall();
   Serial.println("Reached main line. Turning left");
   rotateRight();
   
-  stopMotor();
-  stall();
 }
 
-void shoot() {
-  
+void findEndingArea() {
+  while(1) {
+    lineFollow();
+    if(qti[1].isWhite() && qti[2].isWhite())
+      break;
+  }
+  forward(1000);
 }
 
-void getCoord() {
-  
-  Serial.println("!get_coords");
-  
-}
 
 
 

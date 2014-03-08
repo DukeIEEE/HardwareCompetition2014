@@ -16,11 +16,13 @@ boolean RPi_check() {
 
 void RPi_getTargetCoords() {
   int tries = 0;
-  RPi_target_x = RPi_target_y = 0;
-  while(RPi_target_x == 0 || RPi_target_y == 0) {
+  RPi_target_x = RPi_target_y = -1;
+  boolean success = true;
+  while(RPi_target_x == -1 || RPi_target_y == -1) {
     Serial.println("!target_coords");
+    delay(2000);
     RPi_target_x = Serial.parseInt();
-    RPi_target_y = Serial.parseInt();  
+    RPi_target_y = Serial.parseInt(); 
     ++tries;
     if(tries > 20)
       break;
