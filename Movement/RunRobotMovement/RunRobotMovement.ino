@@ -49,11 +49,11 @@ void setup() {
 
   setupGun();
 
-  left_servos.attach(PIN_LEFT_MOTOR);
+  /*left_servos.attach(PIN_LEFT_MOTOR);
   right_servos.attach(PIN_RIGHT_MOTOR);
   stopMotor();
 
-  setupPhotoSensor();
+  setupPhotoSensor()*/
  
   //ignore initial qti readings
   for(int j = 0; j < 10; ++j) {
@@ -68,16 +68,21 @@ void loop() {
   Serial.println("Running");
   //make sure RPi is connected and operating properly
  
-  leaveStartingArea();
-  
-  /*while(!RPi_check())
+  //leaveStartingArea();
+  while(1){
+    aimVertical();
+    Serial.println("yay");
+    delay(100);
+  }
+  /*
+  while(!RPi_check())
     delay(1000);
   digitalWrite(13, HIGH);
   while(1) {
     aimVertical();
     delay(10);
-  }
-  stall();*/
+  }*/
+  stall();
 
 
   // turn to targets 1, 2, 3, and shoot them.
