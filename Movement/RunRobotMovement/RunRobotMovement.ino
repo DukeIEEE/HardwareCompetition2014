@@ -82,11 +82,9 @@ void loop() {
       delay(100);
     }
   }
-  //calibrateHorizontalAim();
 
   while(1){
-    aim();
-    fire();
+    aimAndFire(1);
     delay(2000);
   }
   /*
