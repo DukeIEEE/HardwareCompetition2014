@@ -24,6 +24,8 @@
 #define PIN_TILT                     3
 #define PIN_FIRE                     2
 #define PIN_PHOTO                    A5
+#define PIN_DEBUG_IMAGE              8
+#define PIN_DEBUG_CONN               8
 
 // picture yourself facing same direction as robot is facing:
 // leftmost QTI - 1, 2, 3, 4 - rightmost QTI
@@ -62,6 +64,9 @@ void setup() {
       qti_back[i].UpdateState();
     }
   }
+  
+  //setup debug pins
+  pinMode(PIN_DEBUG_IMAGE, OUTPUT);
 }
 
 void loop() {
@@ -69,9 +74,19 @@ void loop() {
   //make sure RPi is connected and operating properly
  
   //leaveStartingArea();
+  if(RPi_check()) {
+    for(int i = 0; i < 5; ++i) {
+      digitalWrite(PIN_DEBUG_CONN, HIGH);
+      delay(100);
+      digitalWrite(PIN_DEBUG_CONN, LOW);
+      delay(100);
+    }
+  }
+  //calibrateHorizontalAim();
+
   while(1){
     aim();
-    //fire();
+    fire();
     delay(2000);
   }
   /*
