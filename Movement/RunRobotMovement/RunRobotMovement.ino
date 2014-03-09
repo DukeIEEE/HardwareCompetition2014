@@ -70,9 +70,9 @@ void loop() {
  
   //leaveStartingArea();
   while(1){
-    aimVertical();
-    Serial.println("yay");
-    delay(100);
+    aim();
+    //fire();
+    delay(2000);
   }
   /*
   while(!RPi_check())
