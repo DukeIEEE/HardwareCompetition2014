@@ -28,20 +28,34 @@ void qti_set_Reset() {
   }
 }
 
+const int qti_sustain = 100;
+
 boolean qti_set_CheckAllWhite(QTI* qti) {
-  const int sustain = 100;
   boolean works = true;
   for(int i = 0; i < 4; ++i) {
     if(qti[i].isWhite())
-      qti_last[i] = sustain + 1;
+      qti_last[i] = qti_sustain + 1;
     if(qti_last[i] == 0)
       works = false;
     --qti_last[i];
     if(qti_last[i] < 0)
       qti_last[i] = 0;
-   //Serial.print(qti_last[i]);
-   //Serial.print(' ');
   }
-  //Serial.println();
   return works;
 }
+
+boolean qti_set_Check3White(QTI* qti) {
+  boolean works = true;
+  for(int i = 1; i < 4; ++i) {
+    if(qti[i].isWhite())
+      qti_last[i] = qti_sustain + 1;
+    if(qti_last[i] == 0)
+      works = false;
+    --qti_last[i];
+    if(qti_last[i] < 0)
+      qti_last[i] = 0;
+  }
+  return works;
+}
+
+
