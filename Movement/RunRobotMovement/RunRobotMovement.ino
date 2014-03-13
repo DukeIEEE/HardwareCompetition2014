@@ -91,6 +91,7 @@ void setup() {
 void loop() {
   Serial.println("Running");
   //make sure RPi is connected and operating properly
+#ifdef PI_CONNECTED
   while(!RPi_check()) {
     delay(100);
   }
@@ -102,6 +103,7 @@ void loop() {
     digitalWrite(PIN_DEBUG_CONN, LOW);
     delay(100);
   }
+#endif
   
   leaveStartingArea();
   
@@ -331,24 +333,47 @@ void turnAndShoot(int line){
   
   forward(6.5*MS_PER_CM);
   
+  
+  //keep track of white signal from left and right qtis, make sure its sustained for a while
+  const int THRESHOLD = 150;
+  int left_count = 0, right_count = 0;
   qti_set_Reset();
   while(true) {
     lineFollow();
     if(qti_set_CheckAllWhite(qti_back)) {
       back_qti_found_white_line = true;
     }
-    if(qti[1].isWhite(false) && qti[2].isWhite(false))
+    if(qti[1].isWhite())
+      ++left_count;
+    else
+      left_count = 0;
+    if(qti[2].isWhite())
+      ++right_count;
+    else
+      right_count = 0;
+    if(left_count >= THRESHOLD && right_count >= THRESHOLD /*&& back_qti_found_white_line*/) //cross white line regardless of where block is (commented out because battery holder gets caught
       break;
   }
   
   int block_time = millis();
   
-  forward(12*MS_PER_CM);
-  
-  stopMotor();
-  delay(1000);
-  
+  //move forward to cover block while reading back qtis in case we havent crossed white line
+  int start_time = millis();
+  left_servos.write(CENTER + DELTA);
+  right_servos.write(CENTER - DELTA);
+  while(millis() - start_time < 12*MS_PER_CM) {
+    if(qti_set_CheckAllWhite(qti_back)) {
+      back_qti_found_white_line = true;
+    }
+  }
+  //forward(12*MS_PER_CM);
+
+#ifdef PI_CONNECTED  
   aimAndFire(line);
+#else
+  stopMotor();
+  delay(1000);  
+#endif
   
   Serial.println("Done shooting. Turning around/Getting oriented on line.");
   if(!back_qti_found_white_line) {

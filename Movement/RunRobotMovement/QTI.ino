@@ -28,7 +28,7 @@ void qti_set_Reset() {
   }
 }
 
-const int qti_sustain = 100;
+const int qti_sustain = 150;
 
 boolean qti_set_CheckAllWhite(QTI* qti) {
   boolean works = true;
