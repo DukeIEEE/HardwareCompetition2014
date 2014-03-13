@@ -1,4 +1,6 @@
 
+long photo_threshold = 0;
+
 void setupPhotoSensor() {
   pinMode(PIN_PHOTO, INPUT);
   for(int i = 0; i < 100; ++i) {
@@ -20,4 +22,10 @@ int averagePhotoReading() {
   }
   Serial.println(val/25);
   return val / 25;
+}
+
+
+//are the start leds on?
+boolean StartLedOn() {
+  return averagePhotoReading() < photo_threshold;
 }

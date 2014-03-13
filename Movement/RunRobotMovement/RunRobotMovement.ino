@@ -55,7 +55,6 @@ Servo left_servos, right_servos;
 char RPi_buffer[20];
 int RPi_target_x, RPi_target_y;
 
-long photo_threshold = 0;
 void setup() {
   // set up the ADC
   ADCSRA &= ~PS_128;  // remove bits set by Arduino library
@@ -146,10 +145,8 @@ void leaveStartingArea(){
   
   // TODO: read when LEDs turn on. (perhaps also include timeout to ensure that we don't wait for eternity
   // ??? do LEDs affect QTI sensors ???
-  Serial.println("Photo threshold:");
-  Serial.println(photo_threshold);
   while(1)
-  while(averagePhotoReading() > photo_threshold) delay(10);
+  while(!StartLedOn()) delay(10);
   Serial.println("Line following...");
   while (true){
     lineFollow();
