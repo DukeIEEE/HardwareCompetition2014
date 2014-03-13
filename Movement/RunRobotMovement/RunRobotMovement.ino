@@ -6,7 +6,7 @@
 
 #include "Utilities.h"
 
-
+//pin constants
 #define PIN_LEFT_QTI                 A1
 #define PIN_CENTER_LEFT_QTI          A2
 #define PIN_CENTER_RIGHT_QTI         A3
@@ -26,6 +26,13 @@
 #define PIN_PHOTO                    A5
 #define PIN_DEBUG_IMAGE              8
 #define PIN_DEBUG_CONN               8
+
+//motor constants
+#define MS_PER_CM 33
+#define CENTER 90
+#define DELTA  90
+
+//#define PI_CONNECTED
 
 
 // Define various ADC prescaler
@@ -132,144 +139,6 @@ void loop() {
   stall();
 }
 
-#define CENTER 90
-#define DELTA  90
-#define MS_PER_CM 33
-   
-void lineFollow(){
-  bool off[4];
-  for(int i = 0; i < 4; ++i) {
-    off[i] = qti[i].isBlack();
-  }
-  if(off[0] && off[1] && off[2] && off[3]) {
-    left_servos.write(CENTER + DELTA);
-    right_servos.write(CENTER - DELTA);
-  }
-  else if(off[0] && off[1] && !off[2] && off[3]) {
-    left_servos.write(CENTER + DELTA);
-    right_servos.write(CENTER - DELTA/8);
-  }
-  else if(off[0] && !off[1] && off[2] && off[3]) {
-    left_servos.write(CENTER + DELTA/8);
-    right_servos.write(CENTER - DELTA);
-  }
-  else if(off[0] && off[1] && off[2] && !off[3]) {
-    left_servos.write(CENTER + DELTA);
-    right_servos.write(CENTER - DELTA/16);
-  }
-  else if(!off[0] && off[1] && off[2] && off[3]) {
-    left_servos.write(CENTER + DELTA/16);
-    right_servos.write(CENTER - DELTA);
-  }
-  else {
-      left_servos.write(CENTER + DELTA);
-      right_servos.write(CENTER - DELTA);
-  }
-}
-
-void lineFollow(int time) {
-  long start_time = millis();
-  long stop_time = start_time + time;
-  while(millis() < stop_time) {
-    lineFollow();
-    delay(1);
-  }
-}
-
-void lineFollowReverse(int time) {
-  long start = millis();
-  while(millis() - start < time) {
-    lineFollowReverse();
-    delay(1);
-  }
-}
-
-void lineFollowReverse(){
-  bool off[4];
-  for(int i = 0; i < 4; ++i) {
-    off[i] = qti_back[i].isBlack();
-  }
-  if(off[0] && off[1] && off[2] && off[3]) {
-    left_servos.write(CENTER - DELTA);
-    right_servos.write(CENTER + DELTA);
-  }
-  else if(off[0] && off[1] && !off[2] && off[3]) {
-    left_servos.write(CENTER - DELTA/8);
-    right_servos.write(CENTER + DELTA);
-  }
-  else if(off[0] && !off[1] && off[2] && off[3]) {
-    left_servos.write(CENTER - DELTA);
-    right_servos.write(CENTER + DELTA/8);
-  }
-    else if(off[0] && off[1] && off[2] && !off[3]) {
-    left_servos.write(CENTER - DELTA/16);
-    right_servos.write(CENTER + DELTA);
-  }
-  else if(!off[0] && off[1] && off[2] && off[3]) {
-    left_servos.write(CENTER - DELTA);
-    right_servos.write(CENTER + DELTA/16);
-  }
-  else {
-    left_servos.write(CENTER - DELTA);
-    right_servos.write(CENTER + DELTA);
-  }
-}
-
-void forward(int time) {
-  left_servos.write(CENTER + DELTA);
-  right_servos.write(CENTER - DELTA);
-  delay(time);
-}
-
-void backward(int time) {
-  left_servos.write(CENTER - DELTA);
-  right_servos.write(CENTER + DELTA);
-  delay(time);
-}
-
-void stopMotor() {
-  left_servos.write(90);
-  right_servos.write(90);
-}
-
-void rotateLeft2() {
-  left_servos.write(78);
-  right_servos.write(70);
-  delay(1000);
-  while(qti_back[2].isBlack()) {}
-  stopMotor();
-}
-
-void rotateRight2() {
-  left_servos.write(95);
-  right_servos.write(110);
-  delay(1000);
-  while(qti_back[1].isBlack()) {}
-  lineFollowReverse(14*MS_PER_CM);
-  stopMotor();
-}
-
-void setupPhotoSensor() {
-  pinMode(PIN_PHOTO, INPUT);
-  for(int i = 0; i < 100; ++i) {
-    photo_threshold += analogRead(PIN_PHOTO);
-    delay(10);
-    Serial.println(analogRead(PIN_PHOTO));
-  }
-  photo_threshold /= 100;
-  photo_threshold -= 60;
-  Serial.print("Photo threshold: ");
-  Serial.println(photo_threshold);
-}
-
-int averagePhotoReading() {
-  int val = 0;
-  for(int i = 0; i < 25; ++i) {
-    val += analogRead(PIN_PHOTO);
-    delay(10);
-  }
-  return val / 25;
-}
 
 void leaveStartingArea(){
   // This function reads when the LEDs of the starting area get lit, then
@@ -279,6 +148,7 @@ void leaveStartingArea(){
   // ??? do LEDs affect QTI sensors ???
   Serial.println("Photo threshold:");
   Serial.println(photo_threshold);
+  while(1)
   while(averagePhotoReading() > photo_threshold) delay(10);
   Serial.println("Line following...");
   while (true){
