@@ -31,8 +31,8 @@ void Processor::Process(cv::Mat frame) {
 
 	Mat mask_A, mask_B, mask_sam;
 
-	inRange(hsv, Scalar(8, 0, 0), Scalar(127, 255, 255), mask_A);
-	inRange(hsv, Scalar(0, 0, 0), Scalar(255, 131, 255), mask_B);
+	inRange(hsv, Scalar(/*8*/ 16, 0, 0), Scalar(127, 255, 255), mask_A);
+	inRange(hsv, Scalar(0, 0, 0), Scalar(255, /*131*/ 120, 255), mask_B);
 	mask_sam = ~mask_A & ~mask_B;
 
 	Mat mask;
@@ -119,10 +119,10 @@ void Processor::Process(cv::Mat frame) {
 		for (int i = 0; i < temp.size(); ++i)
 			circle(equalized, Point(blocks[temp[i]].x, blocks[temp[i]].y), 3, Scalar(255, 0, 255), -1, 8);
 		circle(equalized, center, 3, Scalar(255, 0, 0), -1, 8, 0);
-		std::cout << center.x << "," << center.y <<std::endl;
+		std::cout << center.x << " " << center.y <<std::endl;
 		set_img(equalized);
 		return;
 	}
-	std::cout << "0,0" << std::endl;
+	std::cout << "0 0" << std::endl;
 	set_img(equalized);
 }
