@@ -13,7 +13,7 @@
 
 using namespace cv;
 
-int main0() {
+int main2() {
 	std::unique_ptr<FrameProcessor> processor(new Processor());//new WhiteRectangleDetection());
 	CvCapture* capture;
 	Mat frame;
@@ -31,8 +31,10 @@ int main0() {
 
 	while (true) {
 		frame = cvQueryFrame(capture);
-		if (!frame.empty())
+		if (!frame.empty()) {
+			resize(frame, frame, Size(640, 480));
 			processor->Process(frame);
+		}
 		else {
 			break;
 		}
