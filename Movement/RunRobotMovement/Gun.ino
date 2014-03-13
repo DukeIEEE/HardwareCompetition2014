@@ -119,7 +119,7 @@ void aimAndFire(int line) {
   int tries = 0;
   int failed_tries = 0;
   RPi_getTargetCoords();
-  while(tries < 8 && (RPi_target_x > CENTER_X + X_THRESH[line] || RPi_target_x < CENTER_X - X_THRESH[line] 
+  while(tries < 20 && (RPi_target_x > CENTER_X + X_THRESH[line] || RPi_target_x < CENTER_X - X_THRESH[line] 
       || RPi_target_y > CENTER_Y + Y_THRESH[line] || RPi_target_y < CENTER_Y - Y_THRESH[line])) {
       if(RPi_target_x != 0 && RPi_target_y != 0) { //make sure coordinates are good
         
@@ -139,11 +139,11 @@ void aimAndFire(int line) {
       }
       else {
         ++failed_tries;
-        if(failed_tries >= 3)
+        if(failed_tries >= 6)
           break;
         //try rotating platform to the left a little bit
-        if(failed_tries == 1) {
-          rotatePlatform(800);
+        if(failed_tries <= 4) {
+          rotatePlatform(900);
         }
         else { //now just hope we find something...
           rotatePlatform(-1500);

@@ -91,7 +91,18 @@ void setup() {
 void loop() {
   Serial.println("Running");
   //make sure RPi is connected and operating properly
- 
+  while(!RPi_check()) {
+    delay(100);
+  }
+  
+  //show that rpi has connected
+  for(int i = 0; i < 5; ++i) {
+    digitalWrite(PIN_DEBUG_CONN, HIGH);
+    delay(100);
+    digitalWrite(PIN_DEBUG_CONN, LOW);
+    delay(100);
+  }
+  
   leaveStartingArea();
   
  /* if(RPi_check()) {
@@ -337,7 +348,7 @@ void turnAndShoot(int line){
   stopMotor();
   delay(1000);
   
-  //aimAndFire();
+  aimAndFire(line);
   
   Serial.println("Done shooting. Turning around/Getting oriented on line.");
   if(!back_qti_found_white_line) {
