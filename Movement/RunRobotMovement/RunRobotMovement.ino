@@ -79,6 +79,7 @@ void setup() {
  
   for(int i = 0; i < 4; ++i) {
     qti[i].Setup();
+    qti_back[i].Setup();
   }
   //ignore initial qti readings
   for(int j = 0; j < 10; ++j) {
