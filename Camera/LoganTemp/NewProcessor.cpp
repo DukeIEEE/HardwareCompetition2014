@@ -15,7 +15,7 @@ using namespace cv;
 using namespace std;
 
 //#define SHOW_IMAGES
-//#define SAVE_IMAGES
+#define SAVE_IMAGES
 //#define COMPUTER_MODE
 
 #if defined(SAVE_IMAGES) | defined(SHOW_IMAGES)
@@ -163,34 +163,16 @@ void NewProcessor::ProcessBlocks(vector<Block>& blocks, Mat& img) {
 			}
 			LOG("dist: "); LOG((var_x + var_y)); LOG("; area: "); LOG(var_area/mean_area); LOG("\n");
 			combo_value = distanceWeight*(var_x + var_y) + areaWeight*var_area/mean_area;
-
-			//go through all permutations and make sure it's a square object
-			/*vector<int> combo_temp(combo);
-			double combo_best_norm = 1e20;
-			do {
-				double combo_norm = 0.0;
-				Block& top_left = blocks[combo_temp[0]];
-				Block& bottom_left = blocks[combo_temp[1]];
-				Block& top_right = blocks[combo_temp[2]];
-				Block& bottom_right = blocks[combo_temp[3]];
-
-				combo_norm += SQ(top_left.x - bottom_left.x) + SQ(top_left.y - top_right.y) +
-								SQ(bottom_left.y - bottom_right.y) + SQ(top_right.x - bottom_right.x);
-
-				vector<double> dist;
-				dist.push_back(sqrt(top_left.distance2(bottom_left)));
-				dist.push_back(sqrt(top_left.distance2(top_right)));
-				dist.push_back(sqrt(bottom_right.distance2(bottom_left)));
-				dist.push_back(sqrt(bottom_right.distance2(top_right)));
-				combo_norm += variance(dist);
-
-				if(combo_norm < combo_best_norm)
-					combo_best_norm = combo_norm;
-			} while(next_permutation(combo_temp.begin(), combo_temp.end()));
-
-			LOG(combo_best_norm); LOG("\n");
-			combo_value += combo_best_norm;*/
+			
 			combo_value /= mean_area;
+			LOG(combo_value); LOG("\n");
+			//check for squareness
+			vector<Point> points;
+			for(int i = 0; i < 4; ++i)
+				points.push_back(Point(blocks[combo[i]].x,blocks[combo[i]].y));
+			Rect brect = boundingRect(points); 
+			combo_value += ((double)(brect.width-brect.height)*(brect.width-brect.height))/brect.area();
+			LOG("brect: "); LOG((((double)(brect.width-brect.height)*(brect.width-brect.height))/brect.area()));
 			LOG(combo_value); LOG("\n");
 
 			//qu.push(Combo(combo, combo_value, center));
