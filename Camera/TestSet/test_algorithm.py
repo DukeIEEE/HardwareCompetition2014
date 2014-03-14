@@ -20,6 +20,7 @@ if len(sys.argv) > 3:
 data = read_results(os.path.join(PATH, RESULTS_FILE))
 #calculate error
 total_error = 0
+correct = 0
 for key,value in data.items():
   print("Running on " + key + "...")
   s = subprocess.Popen([EXE, os.path.join(PATH,key)], shell=True, stdout=subprocess.PIPE)
@@ -34,6 +35,8 @@ for key,value in data.items():
   ty = value[1]
   
   error = (x - tx)*(x - tx) + (y - ty)*(y - ty)
+  if error < 80:
+    correct += 1
   print("True: ({0},{1})".format(tx, ty))
   print("Detected: ({0},{1})".format(x,y))
   print("Error: {0}\n".format(error))
@@ -42,3 +45,4 @@ for key,value in data.items():
 
 total_error = float(total_error)/len(data)
 print("Total error (normalized): {0}".format(total_error))
+print("Percent correct: {0}".format(float(correct)/len(data)))

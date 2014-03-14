@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <string>
 #include <algorithm>
 
@@ -14,7 +15,7 @@ using namespace cv;
 using namespace std;
 
 //#define SHOW_IMAGES
-#define SAVE_IMAGES
+//#define SAVE_IMAGES
 //#define COMPUTER_MODE
 
 #if defined(SAVE_IMAGES) | defined(SHOW_IMAGES)
@@ -32,7 +33,7 @@ using namespace std;
 
 //define the constants
 const int NewProcessor::MIN_BLOCK_AREA = 100;
-const double NewProcessor::areaWeight = 1;
+const double NewProcessor::areaWeight = 100;
 const double NewProcessor::distanceWeight = 2;
 
 void NewProcessor::GenerateMask(Mat& img, Mat& mask) {
@@ -127,6 +128,8 @@ void NewProcessor::ProcessBlocks(vector<Block>& blocks, Mat& img) {
 	file.open(std::string("output/") + filename + std::string(".txt"));
 #endif
 	if(blocks.size() >= 4) {
+		//priority_queue<Combo> qu;
+
 		vector<int> combo; //the combination
 
 		vector<int> best_combo; //save the best ones for now
@@ -162,7 +165,7 @@ void NewProcessor::ProcessBlocks(vector<Block>& blocks, Mat& img) {
 			combo_value = distanceWeight*(var_x + var_y) + areaWeight*var_area/mean_area;
 
 			//go through all permutations and make sure it's a square object
-			vector<int> combo_temp(combo);
+			/*vector<int> combo_temp(combo);
 			double combo_best_norm = 1e20;
 			do {
 				double combo_norm = 0.0;
@@ -186,9 +189,11 @@ void NewProcessor::ProcessBlocks(vector<Block>& blocks, Mat& img) {
 			} while(next_permutation(combo_temp.begin(), combo_temp.end()));
 
 			LOG(combo_best_norm); LOG("\n");
-			combo_value += combo_best_norm;
+			combo_value += combo_best_norm;*/
 			combo_value /= mean_area;
 			LOG(combo_value); LOG("\n");
+
+			//qu.push(Combo(combo, combo_value, center));
 
 			//see if combo is actually better
 			if (combo_value < best_combo_value) {
@@ -202,6 +207,53 @@ void NewProcessor::ProcessBlocks(vector<Block>& blocks, Mat& img) {
 			}
 			res = gen_comb_norep_lex_next(combo, blocks.size(), 4);
 		}
+
+		//loop through our best possible combos
+		/*for(int i = 0; i < 0; ++i) {
+			if(qu.empty())
+				break;
+			Combo& c = qu.top();
+
+			double combo_best_norm = 1e20;
+			//loop through all permutations and perform square check
+			do {
+				double combo_norm = 0.0;
+				Block& top_left = blocks[c.combo[0]];
+				Block& bottom_left = blocks[c.combo[1]];
+				Block& top_right = blocks[c.combo[3]];
+				Block& bottom_right = blocks[c.combo[2]];
+
+				combo_norm += SQ(top_left.x - bottom_left.x)/top_left.distance2(bottom_left);
+				combo_norm += SQ(top_right.x - bottom_right.x)/top_right.distance2(bottom_right);
+				combo_norm += SQ(bottom_left.y - bottom_right.y)/bottom_left.distance2(bottom_right);
+				combo_norm += SQ(top_left.y - top_right.y)/top_left.distance2(top_right);
+
+				for(int j = 0; j < 4; ++j) {
+					int k = j + 1;
+					int m = j - 1;
+					if(k > 3) k = 0;
+					if(m < 0) m = 3;
+					combo_norm += abs((blocks[c.combo[j]].x - blocks[c.combo[k]].x)*(blocks[c.combo[j]].x - blocks[c.combo[m]].x) + 
+						(blocks[c.combo[j]].y - blocks[c.combo[k]].y)*(blocks[c.combo[j]].y - blocks[c.combo[m]].y));
+				}
+
+				if(combo_norm < combo_best_norm)
+					combo_best_norm = combo_norm;
+			} while(next_permutation(c.combo.begin(), c.combo.end()));
+			qu.pop();
+
+			double combo_value = combo_best_norm;
+			if (combo_value < best_combo_value) {
+				best_combo_value = combo_value;
+				best_center = c.center;
+
+				//copy into new vector
+				best_combo.clear();
+				for (int i = 0; i < combo.size(); ++i)
+					best_combo.push_back(combo[i]);
+			}
+		}*/
+
 		LOG("best combo value: "); LOG(best_combo_value); LOG("\n");
 #ifdef COMPUTER_MODE
 		for (int i = 0; i < best_combo.size(); ++i)
