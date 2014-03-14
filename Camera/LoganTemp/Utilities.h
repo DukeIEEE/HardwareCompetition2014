@@ -7,6 +7,8 @@ extern void generateSobelMask(cv::Mat in, cv::Mat & out, int thresh);
 extern double mean(std::vector<double>&);
 extern double variance(std::vector<double>&);
 
+extern double angle(cv::Point&pt1, cv::Point&pt2, cv::Point&pt0);
+
 //generators
 
 /* 24.12.2008 last modification: 26.06.2013

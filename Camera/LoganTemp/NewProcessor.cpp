@@ -99,6 +99,8 @@ void NewProcessor::GenerateBlocks(vector<Block>& blocks, Mat& mask, Mat& img) {
 	for (unsigned int i = 0; i < contours.size(); i++) {
 		double contour_area = contourArea(contours[i]);
 		if (contour_area < MIN_BLOCK_AREA) continue; //filter by area
+		double arc_length = arcLength(contours[i], true);
+		if(arc_length*arc_length > 50*contour_area) continue; //oddly shaped region...ignore  
 
 		//find center
 		Moments m = moments(contours[i]);
@@ -128,8 +130,6 @@ void NewProcessor::ProcessBlocks(vector<Block>& blocks, Mat& img) {
 	file.open(std::string("output/") + filename + std::string(".txt"));
 #endif
 	if(blocks.size() >= 4) {
-		//priority_queue<Combo> qu;
-
 		vector<int> combo; //the combination
 
 		vector<int> best_combo; //save the best ones for now
@@ -166,16 +166,44 @@ void NewProcessor::ProcessBlocks(vector<Block>& blocks, Mat& img) {
 			
 			combo_value /= mean_area;
 			LOG(combo_value); LOG("\n");
+
 			//check for squareness
 			vector<Point> points;
 			for(int i = 0; i < 4; ++i)
 				points.push_back(Point(blocks[combo[i]].x,blocks[combo[i]].y));
-			Rect brect = boundingRect(points); 
-			combo_value += ((double)(brect.width-brect.height)*(brect.width-brect.height))/brect.area();
-			LOG("brect: "); LOG((((double)(brect.width-brect.height)*(brect.width-brect.height))/brect.area()));
-			LOG(combo_value); LOG("\n");
 
-			//qu.push(Combo(combo, combo_value, center));
+			//first rearrange points so that we're either going in clockwise or counterclockwise order
+			double maxDist = 0.0;
+			int maxIndex = 1;
+			for(int i = 1; i < 4; ++i) {
+				double dist = SQ(points[0].x - points[i].x) + SQ(points[0].y - points[i].y);
+				if(dist > maxDist) {
+					maxDist = dist;
+					maxIndex = i;
+				}
+			}
+			//swap maximum distance point to index 2
+			Point temp = points[2];
+			points[2].x = points[maxIndex].x;
+			points[2].y = points[maxIndex].y;
+			points[maxIndex].x = temp.x;
+			points[maxIndex].y = temp.y;
+
+			//now compute angles
+			for(int i = 0; i < 4; ++i) {
+				int j = i + 1;
+				int k = i - 1;
+				if(j >= 4) j = 0;
+				if(k < 0) k = 3;
+				if(angle(points[j],points[k],points[i]) > .3) 
+					combo_value += 1e6; //huge penalty
+			}
+
+			//check that the bounding rectangle has equal dimensions
+			Rect brect = boundingRect(points); 
+			combo_value += ((double)(brect.width-brect.height)*(brect.width-brect.height))/brect.area()*10;
+			LOG("brect: "); LOG((((double)(brect.width-brect.height)*(brect.width-brect.height))/brect.area())); LOG("\n");
+			LOG(combo_value); LOG("\n");
 
 			//see if combo is actually better
 			if (combo_value < best_combo_value) {
