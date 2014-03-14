@@ -1,4 +1,6 @@
+
 #include <SoftwareSerial.h>
+
 #include <Servo.h>
 
 #include "QTI.h"
@@ -77,7 +79,6 @@ void setup() {
  
   for(int i = 0; i < 4; ++i) {
     qti[i].Setup();
-    qti_back[i].Setup();
   }
   //ignore initial qti readings
   for(int j = 0; j < 10; ++j) {
@@ -145,7 +146,7 @@ void leaveStartingArea(){
   
   // TODO: read when LEDs turn on. (perhaps also include timeout to ensure that we don't wait for eternity
   // ??? do LEDs affect QTI sensors ???
-  while(1)
+  
   while(!StartLedOn()) delay(10);
   Serial.println("Line following...");
   while (true){
