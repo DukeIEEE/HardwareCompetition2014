@@ -1,8 +1,11 @@
 #pragma once
+#include <vector>
 
 extern cv::Mat equalizeIntensity(const cv::Mat&);
 extern void generateSobelMask(cv::Mat in, cv::Mat & out, int thresh);
 
+extern double mean(std::vector<double>&);
+extern double variance(std::vector<double>&);
 
 //generators
 
@@ -24,3 +27,4 @@ combinatorial generation functions public interfaces
 //combinatorial generation functions
 int gen_comb_norep_lex_init(std::vector<int>&, int, int);
 int gen_comb_norep_lex_next(std::vector<int>&, int, int);
+

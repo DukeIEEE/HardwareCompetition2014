@@ -8,13 +8,12 @@
 
 #include "Processor.h"
 #include "SimpleProcessor.h"
-#include "WhiteRectangleDetection.h"
-#include "CombinedProcessor.h"
+#include "NewProcessor.h"
 
 using namespace cv;
 
 int main0() {
-	std::unique_ptr<FrameProcessor> processor(new Processor());//new WhiteRectangleDetection());
+	std::unique_ptr<FrameProcessor> processor(new NewProcessor(""));//new WhiteRectangleDetection());
 	CvCapture* capture;
 	Mat frame;
 

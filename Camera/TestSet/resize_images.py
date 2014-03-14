@@ -2,7 +2,7 @@
 import os
 import cv2
 
-SIZE = (1280, 960)
+SIZE = (640, 480)
 PATH = '.'
 IMAGE_EXT = '.jpg'
 

@@ -5,10 +5,11 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 #include <stdio.h>
 
 #include "Processor.h"
-#include "CombinedProcessor.h"
+#include "NewProcessor.h"
 
 using namespace cv;
 
@@ -17,7 +18,7 @@ int main(int argc,  char** argv) {
     std::cout << "Usage: main_pi [input_image] [output_image]" << std::endl;
     return 0;
   }
-	FrameProcessor* processor = new Processor();
+	FrameProcessor* processor = new NewProcessor(argv[1]);
   
   //std::cout << "Reading input from " << argv[1] << std::endl;
 	Mat frame = imread(argv[1]);

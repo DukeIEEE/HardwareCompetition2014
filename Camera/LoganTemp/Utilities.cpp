@@ -7,6 +7,24 @@
 
 using namespace cv;
 
+double mean(std::vector<double>& vec) {
+	double ret = 0.0;
+	for(int i = 0; i < vec.size(); ++i)
+		ret += vec[i];
+	return ret/vec.size();
+}
+
+//computes the variance of vector of doubles
+double variance(std::vector<double>& vec) {
+	double mean = 0.0;
+	for(int i = 0; i < vec.size(); ++i)
+		mean += vec[i];
+	double ret = 0.0;
+	for(int i = 0; i < vec.size(); ++i)
+		ret += (vec[i] - mean)*(vec[i] - mean);
+	return ret;
+}
+
 /* *
 This function equalizes intensity for a color image (RGB)
 */
@@ -56,7 +74,7 @@ void generateSobelMask(Mat in, Mat & out, int thresh) {
 	sobel.convertTo(out,CV_8U,-255./sobmax,255);
 
 	//threshold out edges
-	threshold(out, out, thresh, 255, CV_THRESH_BINARY_INV);
+	//threshold(out, out, thresh, 255, CV_THRESH_BINARY_INV);
 }
 
 
