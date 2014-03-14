@@ -30,6 +30,7 @@ double variance(std::vector<double>& vec) {
 	double mean = 0.0;
 	for(int i = 0; i < vec.size(); ++i)
 		mean += vec[i];
+	mean /= vec.size();
 	double ret = 0.0;
 	for(int i = 0; i < vec.size(); ++i)
 		ret += (vec[i] - mean)*(vec[i] - mean);

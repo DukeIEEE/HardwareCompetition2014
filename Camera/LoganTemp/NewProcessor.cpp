@@ -165,7 +165,7 @@ void NewProcessor::ProcessBlocks(vector<Block>& blocks, Mat& img) {
 			combo_value = distanceWeight*(var_x + var_y) + areaWeight*var_area/mean_area;
 			
 			combo_value /= mean_area;
-			LOG(combo_value); LOG("\n");
+			LOG("combovalue so far: "); LOG(combo_value); LOG("\n");
 
 			//check for squareness
 			vector<Point> points;
@@ -199,11 +199,31 @@ void NewProcessor::ProcessBlocks(vector<Block>& blocks, Mat& img) {
 					combo_value += 1e6; //huge penalty
 			}
 
+			//check that edges are equal in length
+			vector<double> lengths;
+			for(int i = 0; i < 4; ++i) {
+				int j = i + 1;
+				int k = i - 1;
+				if(j >= 4) j = 0;
+				lengths.push_back(sqrt(SQ(points[i].x - points[j].x) + SQ(points[i].y - points[j].y)));
+			}
+			double m = mean(lengths);
+			double var = variance(lengths)/m/m;
+			LOG("length var: "); LOG(var/m/m); LOG("\n");
+			combo_value += var/m/m*1e6;
+			//check that we're parallel to the screen
+
 			//check that the bounding rectangle has equal dimensions
-			Rect brect = boundingRect(points); 
+			/*Rect brect = boundingRect(points); 
 			combo_value += ((double)(brect.width-brect.height)*(brect.width-brect.height))/brect.area()*10;
 			LOG("brect: "); LOG((((double)(brect.width-brect.height)*(brect.width-brect.height))/brect.area())); LOG("\n");
 			LOG(combo_value); LOG("\n");
+
+			RotatedRect rrect = minAreaRect(points);
+			int nearest = fabs(rrect.angle)/90 + .5;
+			if(fabs(fabs(rrect.angle) - nearest*90)  > 30)
+				combo_value += 1e6; //huge penalty
+			LOG(rrect.angle); LOG("\n");*/
 
 			//see if combo is actually better
 			if (combo_value < best_combo_value) {
