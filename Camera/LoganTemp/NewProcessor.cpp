@@ -74,6 +74,8 @@ void NewProcessor::GenerateMask(Mat& img, Mat& mask) {
 	inRange(hsv, Scalar(/*8*/ 16, 0, 0), Scalar(125, 255, 255), mask_A);
 	inRange(hsv, Scalar(0, 0, 0), Scalar(127, 100, 255), mask_B);
 	mask = ~mask_A & ~mask_B;
+
+	medianBlur(mask, mask, 3);
 	imshow("mask", mask);
 #ifdef SAVE_IMAGES
 	imwrite(std::string("output/mask/") + filename, mask);

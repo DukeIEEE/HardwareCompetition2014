@@ -35,6 +35,11 @@
 #define DELTA  90
 
 //#define PI_CONNECTED
+#define TEST_SHOOTING
+
+#ifdef TEST_SHOOTING
+#define PI_CONNECTED
+#endif
 
 
 // Define various ADC prescaler
@@ -112,22 +117,15 @@ void loop() {
     delay(100);
   }
 #endif
-  
-  leaveStartingArea();
-  
- /* if(RPi_check()) {
-    for(int i = 0; i < 5; ++i) {
-      digitalWrite(PIN_DEBUG_CONN, HIGH);
-      delay(100);
-      digitalWrite(PIN_DEBUG_CONN, LOW);
-      delay(100);
-    }
-  }
 
+#ifndef TEST_SHOOTING  
+  leaveStartingArea();
+#else
   while(1){
     aimAndFire(1);
     delay(2000);
-  }*/
+  }
+#endif
 
   // turn to targets 1, 2, 3, and shoot them.
   // then turn back to main line.
