@@ -119,7 +119,7 @@ void aimAndFire(int line) {
   int tries = 0;
   int failed_tries = 0;
   RPi_getTargetCoords();
-  while(tries < 20 && (RPi_target_x > CENTER_X + X_THRESH[line] || RPi_target_x < CENTER_X - X_THRESH[line] 
+  while(tries < 8 && (RPi_target_x > CENTER_X + X_THRESH[line] || RPi_target_x < CENTER_X - X_THRESH[line] 
       || RPi_target_y > CENTER_Y + Y_THRESH[line] || RPi_target_y < CENTER_Y - Y_THRESH[line])) {
       if(RPi_target_x != 0 && RPi_target_y != 0) { //make sure coordinates are good
         
@@ -139,14 +139,17 @@ void aimAndFire(int line) {
       }
       else {
         ++failed_tries;
-        if(failed_tries >= 6)
+        if(failed_tries >= 4)
           break;
         //try rotating platform to the left a little bit
-        if(failed_tries <= 4) {
+        if(failed_tries <= 2) {
           rotatePlatform(900);
         }
+        else if(failed_tries == 3) {
+          rotatePlatform(-1900);
+        }
         else { //now just hope we find something...
-          rotatePlatform(-1500);
+          rotatePlatform(-900);
         }
       }
       RPi_getTargetCoords();
@@ -158,7 +161,6 @@ void aimAndFire(int line) {
       }
       ++tries;
   }
-  
   tilt.detach();
   platform.detach();
   
@@ -185,7 +187,7 @@ void aimAndFire(int line) {
   
   //trigger forward to shoot
   trigger.writeMicroseconds(1000);
-  delay(800);
+  delay(1000);
   
   //trigger back
   trigger.writeMicroseconds(1900);
@@ -194,6 +196,9 @@ void aimAndFire(int line) {
   // turn gun off
   digitalWrite(PIN_FIRE,LOW);
   trigger.detach();
+  
+  platform.attach(PIN_PLATFORM);
+  restorePlatform();
+  platform.detach();
 }
-
 

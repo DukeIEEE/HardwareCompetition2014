@@ -111,3 +111,9 @@ void rotateRight2() {
   stopMotor();
 }
 
+void jerkRight() {
+  left_servos.write(CENTER + DELTA);
+  right_servos.write(CENTER);
+  delay(350);
+}
+

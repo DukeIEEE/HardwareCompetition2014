@@ -34,8 +34,8 @@
 #define CENTER 90
 #define DELTA  90
 
-//#define PI_CONNECTED
-#define TEST_SHOOTING
+#define PI_CONNECTED
+//#define TEST_SHOOTING
 
 #ifdef TEST_SHOOTING
 #define PI_CONNECTED
@@ -192,14 +192,17 @@ void turnAndShoot(int line){
       break;
   }
   
+  if(line == 1)
+    jerkRight();
+    
   Serial.println("Reached white line");
   
   boolean back_qti_found_white_line = false;
+  boolean seen_blue_block = false;
   
   int first_white_line_time = millis();
   
   forward(6.5*MS_PER_CM);
-  
   
   //keep track of white signal from left and right qtis, make sure its sustained for a while
   const int THRESHOLD = 150;
@@ -218,27 +221,31 @@ void turnAndShoot(int line){
       ++right_count;
     else
       right_count = 0;
-    if(left_count >= THRESHOLD && right_count >= THRESHOLD /*&& back_qti_found_white_line*/) //cross white line regardless of where block is (commented out because battery holder gets caught
+    if(left_count >= THRESHOLD && right_count >= THRESHOLD) {
+      seen_blue_block = true;
+      if(back_qti_found_white_line) //if we saw the white line first, drive forward a little bit
+        forward(12*MS_PER_CM);
+    }
+    if(seen_blue_block && back_qti_found_white_line) //cross white line regardless of where block is (commented out because battery holder gets caught
       break;
   }
   
-  int block_time = millis();
+  //int block_time = millis();
   
   //move forward to cover block while reading back qtis in case we havent crossed white line
-  int start_time = millis();
+  /*int start_time = millis();
   left_servos.write(CENTER + DELTA);
   right_servos.write(CENTER - DELTA);
   while(millis() - start_time < 12*MS_PER_CM) {
     if(qti_set_CheckAllWhite(qti_back)) {
       back_qti_found_white_line = true;
     }
-  }
-  //forward(12*MS_PER_CM);
+  }*/
 
+  stopMotor();
 #ifdef PI_CONNECTED  
   aimAndFire(line);
 #else
-  stopMotor();
   delay(1000);  
 #endif
   
@@ -271,9 +278,9 @@ void turnAndShoot(int line){
   } 
 
   //start turn later if not enough momentum
-  if(block_time - first_white_line_time < 3000) {
+  //if(block_time - first_white_line_time < 3000) {
     backward(100);
-  }
+ // }
 
   Serial.println("Reached main line. Turning left");
   rotateRight2();
@@ -288,12 +295,23 @@ void turnAndShoot(int line){
 }
 
 void findEndingArea() {
+  const int THRESHOLD = 150;
+  int left_count = 0, right_count = 0;
   while(1) {
     lineFollow();
-    if(qti[1].isWhite() && qti[2].isWhite())
+    if(qti[1].isWhite())
+      ++left_count;
+    else
+      left_count = 0;
+    if(qti[2].isWhite())
+      ++right_count;
+    else
+      right_count = 0;
+    if(left_count >= THRESHOLD && right_count >= THRESHOLD)
       break;
   }
-  forward(13*MS_PER_CM);
+  forward(12*MS_PER_CM);
+  Serial.println("!done");
 }
 
 
