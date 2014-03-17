@@ -107,6 +107,7 @@ void rotateRight2() {
   right_servos.write(110);
   delay(1000);
   while(qti_back[1].isBlack()) {}
+  //forward(500);
   lineFollowReverse(14*MS_PER_CM);
   stopMotor();
 }

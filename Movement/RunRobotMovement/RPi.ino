@@ -17,7 +17,7 @@ boolean RPi_check() {
 void RPi_getTargetCoords() {
   int tries = 0;
   RPi_target_x = RPi_target_y = -1;
-  Serial.setTimeout(3000);
+  Serial.setTimeout(10000);
   while(RPi_target_x == -1 || RPi_target_y == -1) {
     digitalWrite(PIN_DEBUG_IMAGE, LOW);
     Serial.println("!target_coords");

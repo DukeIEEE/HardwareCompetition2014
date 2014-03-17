@@ -291,7 +291,7 @@ void turnAndShoot(int line){
     if(qti_line_check(qti))
       break;
   }
-  forward(2*MS_PER_CM);
+  forward(4*MS_PER_CM);  // change to 5 cm or more? // used to be 2*MS_PER_CM
 }
 
 void findEndingArea() {

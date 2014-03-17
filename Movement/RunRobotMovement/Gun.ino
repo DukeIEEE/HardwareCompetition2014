@@ -77,20 +77,20 @@ void setTiltAngle(int delta) {
     Serial.println("tilt exceeds 180");
     tilt_angle = 180;
   }
+  // don't go lower than lev
   else if(tilt_angle < 0) {
     Serial.println("tilt below 0");
     tilt_angle = 0;
   }
-  
   tilt.write(tilt_angle);
 }
 
 //keeps track of rotations done on platform to be able to restore it
 void rotatePlatform(int time) {
   if(time < 0)
-    platform.writeMicroseconds(1625);
+    platform.writeMicroseconds(1625);  // QIAN: used to be 1625
   else
-    platform.writeMicroseconds(1375);
+    platform.writeMicroseconds(1375);  // QIAN: used to be 1375
   delay(abs(time));
   platform.writeMicroseconds(1500);
   platform_counts += time;
@@ -111,6 +111,9 @@ void aimAndFire(int line) {
   Serial.println("aiming");
   tilt.attach(PIN_TILT);
   platform.attach(PIN_PLATFORM);
+  
+  tilt.write(120); //set appropriate tilt
+  delay(500);
 
   //put platform back to 90 degrees with robot
   //restorePlatform();
@@ -119,7 +122,8 @@ void aimAndFire(int line) {
   int tries = 0;
   int failed_tries = 0;
   RPi_getTargetCoords();
-  while(tries < 8 && (RPi_target_x > CENTER_X + X_THRESH[line] || RPi_target_x < CENTER_X - X_THRESH[line] 
+  // tries capped at 5
+  while(tries < 5 && (RPi_target_x > CENTER_X + X_THRESH[line] || RPi_target_x < CENTER_X - X_THRESH[line] 
       || RPi_target_y > CENTER_Y + Y_THRESH[line] || RPi_target_y < CENTER_Y - Y_THRESH[line])) {
       if(RPi_target_x != 0 && RPi_target_y != 0) { //make sure coordinates are good
         
@@ -139,17 +143,19 @@ void aimAndFire(int line) {
       }
       else {
         ++failed_tries;
-        if(failed_tries >= 4)
+        if(failed_tries >= 6){
+          rotatePlatform(1400);
           break;
+        }
         //try rotating platform to the left a little bit
         if(failed_tries <= 2) {
-          rotatePlatform(900);
+          rotatePlatform(700);          // QIAN: changed these to rotate left first and by smaller amounts
         }
         else if(failed_tries == 3) {
-          rotatePlatform(-1900);
+          rotatePlatform(-1600);
         }
         else { //now just hope we find something...
-          rotatePlatform(-900);
+          rotatePlatform(-800);
         }
       }
       RPi_getTargetCoords();
@@ -190,11 +196,22 @@ void aimAndFire(int line) {
   delay(1000);
   
   //trigger back
-  trigger.writeMicroseconds(1900);
+  trigger.writeMicroseconds(2000);
   delay(500);
   
   // turn gun off
   digitalWrite(PIN_FIRE,LOW);
+  
+  // turn trigger forward and back a little
+  trigger.writeMicroseconds(1800);
+  delay(500);
+  trigger.writeMicroseconds(2000);
+  delay(500);
+  trigger.writeMicroseconds(1800);
+  delay(500);
+  trigger.writeMicroseconds(2000);
+  delay(500);
+  
   trigger.detach();
   
   platform.attach(PIN_PLATFORM);
