@@ -13,7 +13,7 @@
 
 using namespace cv;
 
-int main(int argc,  char** argv) {
+int main0(int argc,  char** argv) {
   if(argc < 2) {
     std::cout << "Usage: main_pi [input_image] [output_image]" << std::endl;
     return 0;

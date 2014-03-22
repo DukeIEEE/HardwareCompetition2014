@@ -14,8 +14,8 @@
 using namespace cv;
 using namespace std;
 
-//#define SHOW_IMAGES
-#define SAVE_IMAGES
+#define SHOW_IMAGES
+//#define SAVE_IMAGES
 //#define COMPUTER_MODE
 
 #if defined(SAVE_IMAGES) | defined(SHOW_IMAGES)

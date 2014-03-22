@@ -9,11 +9,12 @@
 #include "Processor.h"
 #include "SimpleProcessor.h"
 #include "NewProcessor.h"
+#include "SurfProcessor.h"
 
 using namespace cv;
 
-int main0() {
-	std::unique_ptr<FrameProcessor> processor(new NewProcessor(""));//new WhiteRectangleDetection());
+int main() {
+	std::unique_ptr<FrameProcessor> processor(new SurfProcessor());//new WhiteRectangleDetection());
 	CvCapture* capture;
 	Mat frame;
 

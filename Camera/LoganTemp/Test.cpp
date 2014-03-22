@@ -12,7 +12,7 @@
 
 using namespace cv;
 
-int main(int argc, char**argv) {
+int main1(int argc, char**argv) {
 	//std::cout << "araf " << argv[1] << std::endl;
 	Mat img = imread(argv[1]);
 	//imshow("zsdfads", img); 

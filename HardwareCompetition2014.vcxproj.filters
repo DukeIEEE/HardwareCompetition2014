@@ -27,16 +27,22 @@
     <ClCompile Include="Camera\LoganTemp\Utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera\LoganTemp\WhiteRectangleDetection.cpp">
+    <ClCompile Include="Camera\LoganTemp\CombinedProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\LoganTemp\Main_pi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\LoganTemp\NewProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\LoganTemp\Processor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\LoganTemp\Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Camera\LoganTemp\SurfProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera\LoganTemp\RedWhiteProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera\LoganTemp\CombinedProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,17 +56,22 @@
     <ClInclude Include="Camera\LoganTemp\Utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera\LoganTemp\WhiteRectangleDetection.h">
+    <ClInclude Include="Camera\LoganTemp\CombinedProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\LoganTemp\NewProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\LoganTemp\Processor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera\LoganTemp\SurfProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera\LoganTemp\RedWhiteProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\LoganTemp\CombinedProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Camera\LoganTemp\hackduke_tshirt.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
